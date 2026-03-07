@@ -1,8 +1,8 @@
 # Discogs Label Printer
 
-Generate and print shelf labels for your vinyl collection using your [Discogs](https://www.discogs.com) username or a CSV export. Runs entirely in the browser — [torbjorn.no/discogs-labeler](https://torbjorn.no/discogs-labeler).
+Generate and print labels for your vinyl collection using your [Discogs](https://www.discogs.com) username or a CSV export. Runs in the browser — [torbjorn.no/discogs-labeler](https://torbjorn.no/discogs-labeler).
 
-Supports Avery 3448 label sheets (70×37mm, 24-up A4).
+Currently supports Avery 3448 label sheets (70×37mm, 24-up A4). Those are the only sheets I have available, but I assume it will be trivial to add support for other templates.
 
 ## Dev
 
