@@ -36,60 +36,57 @@ export default function SelectScreen({
   return (
     <div style={{ minHeight: "100vh", background: "#fff" }}>
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#fffffff0", backdropFilter: "blur(12px)", borderBottom: "1px solid #e8e8e8", padding: "12px 20px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <button
-          onClick={() => { setScreen("home"); }}
-          style={{ padding: "7px 12px", background: "transparent", border: "1px solid #e0e0e0", borderRadius: 7, color: "#555", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
-        >
-          ← Back
-        </button>
-        <span style={{ fontSize: 15, fontWeight: 700, color: "#111", letterSpacing: "-0.01em" }}>
-          Discogs<span style={{ color: "#1a6ef5" }}> Label Printer</span>
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#fff", borderBottom: "1px solid #aaa", padding: "10px 20px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <button className="btn" onClick={() => { setScreen("home"); }}>← Back</button>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "#000" }}>
+          Discogs<span style={{ color: "royalblue" }}> Label Printer</span>
         </span>
         {username && <span style={{ fontSize: 12, color: "#aaa" }}>/ {username}</span>}
         <input
           value={searchQ}
           onChange={(e) => setSearchQ(e.target.value)}
           placeholder="Search artist, title, year…"
-          style={{ padding: "7px 12px", background: "#f5f5f5", border: "1px solid #e0e0e0", borderRadius: 7, color: "#111", fontSize: 13, outline: "none", width: 220, marginLeft: "auto" }}
+          style={{ padding: "6px 10px", background: "#fff", border: "1px solid #aaa", color: "#000", fontSize: 13, outline: "none", width: 220, marginLeft: "auto" }}
+          onFocus={(e) => (e.target.style.borderColor = "royalblue")}
+          onBlur={(e) => (e.target.style.borderColor = "#aaa")}
         />
-        <button onClick={() => selectAll(filteredReleases)} style={{ padding: "7px 11px", background: "transparent", border: "1px solid #e0e0e0", borderRadius: 7, color: "#555", fontSize: 12, cursor: "pointer" }}>All</button>
-        <button onClick={clearAll} style={{ padding: "7px 11px", background: "transparent", border: "1px solid #e0e0e0", borderRadius: 7, color: "#555", fontSize: 12, cursor: "pointer" }}>None</button>
-        <span style={{ fontSize: 12, color: "#1a6ef5", fontWeight: 600, fontFamily: "monospace", padding: "7px 11px", background: "#eff6ff", borderRadius: 7 }}>{selected.size} selected</span>
+        <button className="btn" onClick={() => selectAll(filteredReleases)}>All</button>
+        <button className="btn" onClick={clearAll}>None</button>
+        <span style={{ fontSize: 12, color: "royalblue", fontWeight: 700, fontFamily: "monospace", padding: "6px 10px", background: "#f9f9f9", border: "1px solid #aaa" }}>{selected.size} selected</span>
         {sortKey && (
-          <span style={{ fontSize: 12, color: "#888", padding: "7px 10px", background: "#f5f5f5", border: "1px solid #e0e0e0", borderRadius: 7, display: "flex", alignItems: "center", gap: 5 }}>
-            Sorted by <strong style={{ color: "#333" }}>{COLUMNS.find((c) => c.key === sortKey)?.label}</strong> {sortDir === "asc" ? "↑" : "↓"}
+          <span className="box" style={{ fontSize: 12, color: "#555", padding: "6px 10px", display: "flex", alignItems: "center", gap: 5 }}>
+            Sorted by <strong style={{ color: "#000" }}>{COLUMNS.find((c) => c.key === sortKey)?.label}</strong> {sortDir === "asc" ? "↑" : "↓"}
             <button onClick={() => setSortKey(null)} style={{ marginLeft: 2, border: "none", background: "none", color: "#aaa", cursor: "pointer", fontSize: 13, lineHeight: 1, padding: 0 }}>✕</button>
           </span>
         )}
         <button
+          className={selected.size > 0 ? "btn-primary" : "btn"}
           onClick={() => setScreen("preview")}
           disabled={selected.size === 0}
-          style={{ padding: "8px 16px", background: selected.size > 0 ? "#1a6ef5" : "#e0e0e0", color: selected.size > 0 ? "#fff" : "#aaa", border: "none", borderRadius: 7, fontSize: 13, fontWeight: 700, cursor: selected.size > 0 ? "pointer" : "not-allowed" }}
         >
           Preview Labels →
         </button>
       </div>
 
       {/* Stats bar */}
-      <div style={{ padding: "8px 20px", background: "#fafafa", borderBottom: "1px solid #ebebeb", display: "flex", gap: 20, fontSize: 12, color: "#999", alignItems: "center" }}>
+      <div style={{ padding: "7px 20px", background: "#f9f9f9", borderBottom: "1px solid #aaa", display: "flex", gap: 20, fontSize: 12, color: "#777", alignItems: "center" }}>
         <span>{releases.length} records</span>
         <span>{filteredReleases.length} shown</span>
         <span style={{ color: "#ccc" }}>·</span>
-        <span style={{ color: "#bbb" }}>Click any column header to sort · print order follows sort</span>
+        <span>Click any column header to sort · print order follows sort</span>
       </div>
 
       {/* Table */}
       <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, borderLeft: "4px solid #777" }}>
           <thead>
-            <tr style={{ background: "#f9f9f9", borderBottom: "2px solid #e8e8e8" }}>
+            <tr style={{ background: "#eee", borderBottom: "2px solid #aaa" }}>
               <th style={{ width: 40, padding: "10px 12px", textAlign: "center" }}>
                 <input
                   type="checkbox"
                   checked={filteredReleases.length > 0 && filteredReleases.every((r) => selected.has(r.id))}
                   onChange={(e) => e.target.checked ? selectAll(filteredReleases) : clearAll()}
-                  style={{ cursor: "pointer", accentColor: "#1a6ef5" }}
+                  style={{ cursor: "pointer", accentColor: "royalblue" }}
                 />
               </th>
               <th style={{ width: 48, padding: "10px 8px" }} />
@@ -98,7 +95,7 @@ export default function SelectScreen({
                   key={key}
                   className={`sortable${sortKey === key ? " active" : ""}`}
                   onClick={() => handleSortClick(key)}
-                  style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600, color: sortKey === key ? "#1a6ef5" : "#555", fontSize: 12, letterSpacing: "0.02em", whiteSpace: "nowrap", transition: "color 0.15s" }}
+                  style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700, color: sortKey === key ? "royalblue" : "#000", fontSize: 12, letterSpacing: "0.02em", whiteSpace: "nowrap" }}
                 >
                   {label}
                   <SortIcon active={sortKey === key} dir={sortDir} />
@@ -113,33 +110,31 @@ export default function SelectScreen({
                 <tr
                   key={r.id}
                   onClick={() => toggleSelect(r.id)}
-                  style={{ background: isSelected ? "#eff6ff" : i % 2 === 0 ? "#fff" : "#fafafa", borderBottom: "1px solid #f0f0f0", cursor: "pointer", userSelect: "none", transition: "background 0.1s" }}
-                  onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "#f5f9ff"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = isSelected ? "#eff6ff" : i % 2 === 0 ? "#fff" : "#fafafa"; }}
+                  style={{ background: isSelected ? "#f0f0ff" : i % 2 === 0 ? "#fff" : "#eee", borderBottom: "1px dotted #aaa", cursor: "pointer", userSelect: "none" }}
+                  onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "#e8e8ff"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = isSelected ? "#f0f0ff" : i % 2 === 0 ? "#fff" : "#eee"; }}
                 >
                   <td style={{ padding: "9px 12px", textAlign: "center" }}>
-                    <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${isSelected ? "#1a6ef5" : "#ccc"}`, background: isSelected ? "#1a6ef5" : "transparent", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
-                      {isSelected && <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3 5.5L8 1" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                    </div>
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(r.id)} onClick={(e) => e.stopPropagation()} style={{ cursor: "pointer", accentColor: "royalblue" }} />
                   </td>
                   <td style={{ padding: "4px 8px", width: 48 }}>
                     {r.thumb
-                      ? <img src={r.thumb} alt="" style={{ width: 36, height: 36, borderRadius: 4, objectFit: "cover", display: "block", background: "#f0f0f0" }} />
-                      : <div style={{ width: 36, height: 36, borderRadius: 4, background: "#f0f0f0" }} />
+                      ? <img src={r.thumb} alt="" style={{ width: 36, height: 36, objectFit: "cover", display: "block", background: "#f0f0f0" }} />
+                      : <div style={{ width: 36, height: 36, background: "#f0f0f0" }} />
                     }
                   </td>
-                  <td style={{ padding: "9px 12px", fontWeight: 500, color: "#111", whiteSpace: "nowrap", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis" }}>{r.artist}</td>
+                  <td style={{ padding: "9px 12px", fontWeight: 700, color: "#000", whiteSpace: "nowrap", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis" }}>{r.artist}</td>
                   <td style={{ padding: "9px 12px", color: "#333", fontStyle: "italic", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    <a href={r.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ color: "#333", textDecoration: "none", borderBottom: "1px dashed #ccc" }} onMouseEnter={(e) => (e.target.style.borderBottomColor = "#1a6ef5")} onMouseLeave={(e) => (e.target.style.borderBottomColor = "#ccc")}>{r.title}</a>
+                    <a href={r.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ color: "#333", textDecoration: "none", borderBottom: "1px dashed #aaa" }} onMouseEnter={(e) => { e.target.style.color = "royalblue"; e.target.style.borderBottomColor = "royalblue"; }} onMouseLeave={(e) => { e.target.style.color = "#333"; e.target.style.borderBottomColor = "#aaa"; }}>{r.title}</a>
                   </td>
-                  <td style={{ padding: "9px 12px", color: "#666", whiteSpace: "nowrap" }}>{r.year}</td>
-                  <td style={{ padding: "9px 12px", color: "#666", whiteSpace: "nowrap" }}>{r.format}</td>
-                  <td style={{ padding: "9px 12px", color: "#888", fontFamily: "monospace", fontSize: 12, whiteSpace: "nowrap" }}>{r.catno}</td>
-                  <td style={{ padding: "9px 12px", color: "#888", whiteSpace: "nowrap", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>{r.label}</td>
-                  <td style={{ padding: "9px 12px", color: "#888", whiteSpace: "nowrap" }}>{r.dateAdded ? new Date(r.dateAdded).toLocaleDateString() : "—"}</td>
-                  {inputMode === "csv" && <td style={{ padding: "9px 12px", color: "#888", whiteSpace: "nowrap" }}>{r.mediaCond || "—"}</td>}
-                  {inputMode === "csv" && <td style={{ padding: "9px 12px", color: "#888", whiteSpace: "nowrap" }}>{r.sleeveCond || "—"}</td>}
-                  {inputMode === "csv" && <td style={{ padding: "9px 12px", color: "#888", whiteSpace: "nowrap" }}>{r.folder || "—"}</td>}
+                  <td style={{ padding: "9px 12px", color: "#555", whiteSpace: "nowrap" }}>{r.year}</td>
+                  <td style={{ padding: "9px 12px", color: "#555", whiteSpace: "nowrap" }}>{r.format}</td>
+                  <td style={{ padding: "9px 12px", color: "#777", fontFamily: "monospace", fontSize: 12, whiteSpace: "nowrap" }}>{r.catno}</td>
+                  <td style={{ padding: "9px 12px", color: "#777", whiteSpace: "nowrap", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>{r.label}</td>
+                  <td style={{ padding: "9px 12px", color: "#777", whiteSpace: "nowrap" }}>{r.dateAdded ? new Date(r.dateAdded).toLocaleDateString() : "—"}</td>
+                  {inputMode === "csv" && <td style={{ padding: "9px 12px", color: "#777", whiteSpace: "nowrap" }}>{r.mediaCond || "—"}</td>}
+                  {inputMode === "csv" && <td style={{ padding: "9px 12px", color: "#777", whiteSpace: "nowrap" }}>{r.sleeveCond || "—"}</td>}
+                  {inputMode === "csv" && <td style={{ padding: "9px 12px", color: "#777", whiteSpace: "nowrap" }}>{r.folder || "—"}</td>}
                   {inputMode === "csv" && <td style={{ padding: "9px 12px", color: "#aaa", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.notes || "—"}</td>}
                   {inputMode === "csv" && <td style={{ padding: "9px 12px", color: "#f5a623", whiteSpace: "nowrap", letterSpacing: 1 }}>{r.rating ? starsText(r.rating) : "—"}</td>}
                 </tr>
