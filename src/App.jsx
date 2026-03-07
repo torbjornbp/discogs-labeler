@@ -191,8 +191,8 @@ export default function App() {
       )}
 
       {screen === "loading" && (
-        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, background: "#f5f5f5" }}>
-          <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid #e0e0e0", borderTop: "3px solid #1a6ef5", animation: "spin 0.8s linear infinite" }} />
+        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, background: "#fff" }}>
+          <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid #e0e0e0", borderTop: "3px solid royalblue", animation: "spin 0.8s linear infinite" }} />
           <p style={{ color: "#666666", fontSize: 14, textAlign: "center" }}>{loadingMsg}</p>
         </div>
       )}
