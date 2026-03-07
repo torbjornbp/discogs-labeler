@@ -75,6 +75,8 @@ input, button { font-family: inherit; }
   background: #f9f9f9;
 }
 
+.record-table th, .record-table td { border: 1px dotted #777; }
+.record-table thead tr { background: #eee; }
 th.sortable { cursor: pointer; user-select: none; }
 th.sortable:hover { background: #eee; }
 th.sortable.active { color: royalblue; }
