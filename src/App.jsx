@@ -94,7 +94,7 @@ export default function App() {
       if (raw.length === 0) throw new Error("Collection is empty or private.");
       const formatted = raw.map(formatRelease);
       setReleases(formatted);
-      setSelected(new Set(formatted.map((r) => r.id)));
+      setSelected(new Set());
       setScreen("select");
     } catch (e) {
       setError(e.message || "Failed to fetch collection.");
@@ -118,7 +118,7 @@ export default function App() {
         const formatted = parseDiscogsCSV(e.target.result);
         if (formatted.length === 0) throw new Error("No records found in CSV.");
         setReleases(formatted);
-        setSelected(new Set(formatted.map((r) => r.id)));
+        setSelected(new Set());
         setScreen("select");
       } catch (err) {
         setError(err.message || "Failed to parse CSV.");
