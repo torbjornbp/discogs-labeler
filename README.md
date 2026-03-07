@@ -1,16 +1,32 @@
-# React + Vite
+# Discogs Label Printer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Generate and print shelf labels for your vinyl collection using your [Discogs](https://www.discogs.com) username or a CSV export. Runs entirely in the browser — [torbjorn.no/discogs-labeler](https://torbjorn.no/discogs-labeler).
 
-Currently, two official plugins are available:
+Supports Avery 3448 label sheets (70×37mm, 24-up A4).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Dev
 
-## React Compiler
+```bash
+npm install
+npm run dev
+npm run build
+npm run lint
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Self-hosting
 
-## Expanding the ESLint configuration
+It's a static SPA. To serve it from a subpath:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Set `base: '/your-path/'` in `vite.config.js`
+2. `npm run build`
+3. Drop `dist/` wherever your static host expects it
+
+## License
+
+[AGPL v3](LICENSE)
+
+## Stack
+
+- [React 19](https://react.dev)
+- [Vite](https://vite.dev)
+- [Discogs API](https://www.discogs.com/developers/)
