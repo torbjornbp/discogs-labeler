@@ -39,7 +39,7 @@ export default function SelectScreen({
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#fff", borderBottom: "1px solid #aaa", padding: "10px 20px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
         <button className="btn" onClick={() => { setScreen("home"); }}>← Back</button>
         <span style={{ fontSize: 15, fontWeight: 700, color: "#000" }}>
-          Discogs<span style={{ color: "royalblue" }}> Label Printer</span>
+          Torbjørn's <span style={{ color: "royalblue" }}>Discogs Labeler</span>
         </span>
         {username && <span style={{ fontSize: 12, color: "#aaa" }}>/ {username}</span>}
         <input
@@ -78,9 +78,9 @@ export default function SelectScreen({
 
       {/* Table */}
       <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, borderLeft: "4px solid #777" }}>
+        <table className="record-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, borderLeft: "4px solid #777" }}>
           <thead>
-            <tr style={{ background: "#eee", borderBottom: "2px solid #aaa" }}>
+            <tr>
               <th style={{ width: 40, padding: "10px 12px", textAlign: "center" }}>
                 <input
                   type="checkbox"
@@ -110,7 +110,7 @@ export default function SelectScreen({
                 <tr
                   key={r.id}
                   onClick={() => toggleSelect(r.id)}
-                  style={{ background: isSelected ? "#f0f0ff" : i % 2 === 0 ? "#fff" : "#eee", borderBottom: "1px dotted #aaa", cursor: "pointer", userSelect: "none" }}
+                  style={{ background: isSelected ? "#f0f0ff" : i % 2 === 0 ? "#fff" : "#eee", cursor: "pointer", userSelect: "none" }}
                   onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "#e8e8ff"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = isSelected ? "#f0f0ff" : i % 2 === 0 ? "#fff" : "#eee"; }}
                 >

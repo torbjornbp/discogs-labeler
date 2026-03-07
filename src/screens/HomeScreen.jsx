@@ -9,15 +9,12 @@ export default function HomeScreen({ inputMode, setInputMode, username, setUsern
     <div style={{ minHeight: "100vh", width: "100vw", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, background: "#fff", boxSizing: "border-box" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 32, width: "100%", maxWidth: 440, margin: "0 auto" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-            <div style={{ width: 40, height: 40, background: "royalblue", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ width: 10, height: 10, background: "#fff" }} />
-            </div>
+          <div style={{ marginBottom: 12 }}>
             <span style={{ fontSize: 28, fontWeight: 700, color: "#000", letterSpacing: "-0.02em" }}>
-              Discogs<span style={{ color: "royalblue" }}> Label Printer</span>
+              Torbjørn's <span style={{ color: "royalblue" }}>Discogs Labeler</span>
             </span>
           </div>
-          <p style={{ fontSize: 14, color: "#666", lineHeight: 1.5, maxWidth: 320, textAlign: "center" }}>
+          <p style={{ fontSize: 14, color: "#666", lineHeight: 1.5, maxWidth: 320, textAlign: "center", margin: "0 auto" }}>
             Generate printable QR label sheets from your Discogs collection
           </p>
         </div>
@@ -26,7 +23,7 @@ export default function HomeScreen({ inputMode, setInputMode, username, setUsern
           <div style={{ display: "flex", gap: 3 }}>
             {[["username", "Discogs Username"], ["csv", "CSV Upload"]].map(([mode, label]) => (
               <button key={mode} onClick={() => { setInputMode(mode); setError(""); }}
-                style={{ flex: 1, padding: "8px 12px", border: "1px solid #aaa", background: inputMode === mode ? "royalblue" : "#f9f9f9", color: inputMode === mode ? "#fff" : "#555", fontWeight: inputMode === mode ? 700 : 400, fontSize: 13, cursor: "pointer" }}
+                style={{ flex: 1, padding: "8px 12px", border: "1px solid #aaa", boxShadow: "2px 2px #ddd", background: inputMode === mode ? "royalblue" : "#f9f9f9", color: inputMode === mode ? "#fff" : "#555", fontWeight: inputMode === mode ? 700 : 400, fontSize: 13, cursor: "pointer" }}
               >{label}</button>
             ))}
           </div>
@@ -39,7 +36,7 @@ export default function HomeScreen({ inputMode, setInputMode, username, setUsern
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleFetch()}
-                placeholder="e.g. vinylhunter99"
+                placeholder="e.g. jameslastlover"
                 autoComplete="off"
                 style={{ width: "100%", padding: "10px 12px", background: "#fff", border: "1px solid #aaa", color: "#000", fontSize: 14, outline: "none" }}
                 onFocus={(e) => (e.target.style.borderColor = "royalblue")}
