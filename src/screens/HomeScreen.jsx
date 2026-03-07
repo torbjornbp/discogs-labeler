@@ -82,6 +82,7 @@ export default function HomeScreen({ inputMode, setInputMode, username, setUsern
         <p style={{ fontSize: 12, color: "#aaa", textAlign: "center" }}>
           {inputMode === "username" ? "Only public Discogs collections are supported" : "Export via Discogs → My Collection → Export Collection"}
         </p>
+        <a href="https://torbjorn.no" style={{ fontSize: 12, color: "#aaa" }}>← torbjorn.no</a>
       </div>
     </div>
   );
