@@ -42,13 +42,16 @@ export default function App() {
     notes:      { label: "Notes",            on: false },
     folder:     { label: "Folder",           on: false },
     rating:     { label: "Rating",           on: false },
-    tracklist:  { label: "Tracklist",        on: false },
+    tracklist:  { label: "Tracklist",        on: false, showDuration: true },
   };
   const [fields, setFields] = useState(() => {
     const saved = LS.get("fields", null);
     return saved ? { ...defaultFields, ...saved } : defaultFields;
   });
   const [layoutMode, setLayoutMode] = useState(() => LS.get("layoutMode", "single"));
+  // Set of field keys assigned to the right column in twoColumn layout mode.
+  // Stored as an array in localStorage (Set is not JSON-serializable).
+  const [col2Fields, setCol2Fields] = useState(() => new Set(LS.get("col2Fields", ["tracklist"])));
   const [tracklistMap, setTracklistMap] = useState({});
   const [inputMode, setInputMode] = useState("username");
   const [sortKey, setSortKey] = useState(() => LS.get("sortKey", null));
@@ -63,6 +66,7 @@ export default function App() {
   useEffect(() => { LS.set("pad",        pad);       }, [pad]);
   useEffect(() => { LS.set("templateId", template.id); }, [template]);
   useEffect(() => { LS.set("layoutMode", layoutMode); }, [layoutMode]);
+  useEffect(() => { LS.set("col2Fields", [...col2Fields]); }, [col2Fields]);
 
   const sortedReleases = sortReleases(releases, sortKey, sortDir);
   const selectedReleases = sortedReleases.filter((r) => selected.has(r.id));
@@ -169,7 +173,7 @@ export default function App() {
     }
   }
 
-  const labelConfig = { fields, setFields, fieldOrder, setFieldOrder, fontScale, setFontScale, qrScale, setQrScale, pad, setPad, layoutMode, setLayoutMode, tracklistMap };
+  const labelConfig = { fields, setFields, fieldOrder, setFieldOrder, fontScale, setFontScale, qrScale, setQrScale, pad, setPad, layoutMode, setLayoutMode, col2Fields, setCol2Fields, tracklistMap };
 
   return (
     <div style={{ width: "100vw", minHeight: "100vh", overflowX: "hidden" }}>

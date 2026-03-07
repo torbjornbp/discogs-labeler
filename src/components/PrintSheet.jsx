@@ -1,6 +1,6 @@
 import LabelCell from "./LabelCell.jsx";
 
-export default function PrintSheet({ releases, template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap }) {
+export default function PrintSheet({ releases, template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields }) {
   const total = template.cols * template.rows;
   const cells = releases.slice(0, total);
   while (cells.length < total) cells.push(null);
@@ -37,6 +37,7 @@ export default function PrintSheet({ releases, template, fields, fontScale, qrSc
               pad={pad}
               layoutMode={layoutMode}
               tracklistMap={tracklistMap}
+              col2Fields={col2Fields}
             />
           ) : (
             <div

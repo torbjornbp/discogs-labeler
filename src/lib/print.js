@@ -6,36 +6,49 @@ function buildTextField(key, r, tracklist, fields, fmm) {
   const val = key === "tracklist" ? tracklist : FIELD_VALUE(r, key);
   if (!val) return "";
   const s = FIELD_STYLES[key] || {};
+  if (key === "tracklist") {
+    if (!val.length) return "";
+    const showDur = fields.tracklist?.showDuration;
+    return val.map(({ pos, title, duration }) => {
+      const label = pos ? `${pos} ${title}` : title;
+      const dur = showDur && duration
+        ? `<div style="flex-shrink:0;padding-left:1mm;opacity:0.7;">(${duration})</div>`
+        : "";
+      return `<div style="display:flex;align-items:baseline;font-size:${fmm(s.mmSize || 1.6)}mm;font-family:monospace;color:${s.color || "#555"};line-height:1.3;flex-shrink:0;"><div style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${label}</div>${dur}</div>`;
+    }).join("");
+  }
   const fontFamily = s.mono ? "monospace" : "'Inter',sans-serif";
   const notesPrefix = key === "notes" ? '<span style="font-weight:700;font-style:normal;">Notes: </span>' : "";
-  return `<div style="font-size:${fmm(s.mmSize || 2)}mm;font-weight:${s.weight || 400};font-family:${fontFamily};color:${s.color || "#888"};line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:${s.clamp || 1};-webkit-box-orient:vertical;${s.italic ? "font-style:italic;" : ""}">${notesPrefix}${val}</div>`;
+  return `<div style="font-size:${fmm(s.mmSize || 2)}mm;font-weight:${s.weight || 400};font-family:${fontFamily};color:${s.color || "#888"};line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:${s.clamp || 1};-webkit-box-orient:vertical;${s.italic ? "font-style:italic;" : ""}flex-shrink:0;">${notesPrefix}${val}</div>`;
 }
 
-function buildLabel(r, { template, fields, fieldOrder, pad, fontScale, qrScale, layoutMode, tracklistMap }) {
+// Generates the HTML string for a single label.
+// col2Fields (Set) determines which fields go in the right column in twoColumn mode.
+// contentH clamps each column to the padded content area so bottom padding is respected
+// and overflow is clipped cleanly rather than shrinking/overlapping field items.
+function buildLabel(r, { template, fields, fieldOrder, pad, fontScale, qrScale, layoutMode, tracklistMap, col2Fields }) {
   if (!r) return `<div style="width:${template.labelWmm}mm;height:${template.labelHmm}mm;"></div>`;
 
   const qr = QR_API_PRINT(r.url);
   const fmm = (n) => (n * (fontScale || 1)).toFixed(2);
   const showQR = fieldOrder.includes("qr") && fields.qr.on;
   const qrSizeMm = (20 * (qrScale || 1)).toFixed(1);
-  const tracklist = tracklistMap?.[r.releaseId] || "";
-  const showTracklist = fields.tracklist?.on;
+  const tracklist = tracklistMap?.[r.releaseId] || [];
   const qrHTML = showQR ? `<div style="flex-shrink:0;"><img src="${qr}" style="display:block;width:${qrSizeMm}mm;height:${qrSizeMm}mm;" /></div>` : "";
   const outerStyle = `width:${template.labelWmm}mm;height:${template.labelHmm}mm;display:flex;flex-direction:row;align-items:flex-start;padding:${pad.t}mm ${pad.r}mm ${pad.b}mm ${pad.l}mm;box-sizing:border-box;gap:1.5mm;background:#fff;overflow:hidden;`;
 
   if (layoutMode === "twoColumn") {
-    const mainFields = fieldOrder
-      .filter((k) => k !== "qr" && k !== "tracklist")
-      .map((key) => buildTextField(key, r, tracklist, fields, fmm))
-      .join("");
-    const qrHTML = showQR ? `<div style="flex-shrink:0;"><img src="${qr}" style="display:block;width:${qrSizeMm}mm;height:${qrSizeMm}mm;" /></div>` : "";
-    const tracklistLines = tracklist
-      ? tracklist.split("\n").map((line) => `<div style="font-size:${fmm(1.6)}mm;font-family:monospace;color:#555;line-height:1.3;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${line}</div>`).join("")
-      : `<div style="font-size:${fmm(1.4)}mm;color:#ccc;font-style:italic;">—</div>`;
-    const tracklistCol = showTracklist
-      ? `<div style="flex:1;min-width:0;border-left:0.3mm solid #e0e0e0;padding-left:1.5mm;overflow:hidden;">${tracklistLines}</div>`
+    const col2 = col2Fields ? [...col2Fields] : ["tracklist"];
+    const col1Keys = fieldOrder.filter((k) => k !== "qr" && !col2.includes(k));
+    const col2Keys = fieldOrder.filter((k) => col2.includes(k));
+    const col1Html = col1Keys.map((key) => buildTextField(key, r, tracklist, fields, fmm)).join("");
+    const col2Html = col2Keys.map((key) => buildTextField(key, r, tracklist, fields, fmm)).join("");
+    const hasCol2 = col2Keys.some((k) => fields[k]?.on);
+    const contentH = `${(template.labelHmm - pad.t - pad.b).toFixed(2)}mm`;
+    const col2Col = hasCol2
+      ? `<div style="flex:1;min-width:0;border-left:0.3mm solid #e0e0e0;padding-left:1.5mm;overflow:hidden;display:flex;flex-direction:column;gap:0.4mm;max-height:${contentH};">${col2Html}</div>`
       : "";
-    return `<div style="${outerStyle}">${qrHTML}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:0.4mm;">${mainFields}</div>${tracklistCol}</div>`;
+    return `<div style="${outerStyle}">${qrHTML}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:0.4mm;max-height:${contentH};overflow:hidden;">${col1Html}</div>${col2Col}</div>`;
   }
 
   // Standard layout
@@ -43,13 +56,14 @@ function buildLabel(r, { template, fields, fieldOrder, pad, fontScale, qrScale, 
     .filter((k) => k !== "qr")
     .map((key) => buildTextField(key, r, tracklist, fields, fmm))
     .join("");
-  return `<div style="${outerStyle}">${qrHTML}<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:0.5mm;">${textFields}</div></div>`;
+  const contentH = `${(template.labelHmm - pad.t - pad.b).toFixed(2)}mm`;
+  return `<div style="${outerStyle}">${qrHTML}<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:0.5mm;max-height:${contentH};overflow:hidden;">${textFields}</div></div>`;
 }
 
-export function openPrintWindow({ selectedReleases, template, fields, fieldOrder, pad, fontScale, qrScale, layoutMode, tracklistMap }) {
+export function openPrintWindow({ selectedReleases, template, fields, fieldOrder, pad, fontScale, qrScale, layoutMode, tracklistMap, col2Fields }) {
   const size = template.cols * template.rows;
   const sheetsCount = Math.ceil(selectedReleases.length / size);
-  const opts = { template, fields, fieldOrder, pad, fontScale, qrScale, layoutMode, tracklistMap };
+  const opts = { template, fields, fieldOrder, pad, fontScale, qrScale, layoutMode, tracklistMap, col2Fields };
 
   let sheetsHTML = "";
   for (let s = 0; s < sheetsCount; s++) {

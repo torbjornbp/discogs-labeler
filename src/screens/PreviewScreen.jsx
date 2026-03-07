@@ -17,7 +17,7 @@ export default function PreviewScreen({
   inputMode,
   setScreen,
 }) {
-  const { fields, setFields, fieldOrder, setFieldOrder, fontScale, setFontScale, qrScale, setQrScale, pad, setPad, layoutMode, setLayoutMode, tracklistMap } = labelConfig;
+  const { fields, setFields, fieldOrder, setFieldOrder, fontScale, setFontScale, qrScale, setQrScale, pad, setPad, layoutMode, setLayoutMode, col2Fields, setCol2Fields, tracklistMap } = labelConfig;
   const [fetchProgress, setFetchProgress] = useState(null);
   const [draggingKey, setDraggingKey] = useState(null);
   const dragField = useRef(null);
@@ -55,9 +55,9 @@ export default function PreviewScreen({
     return selectedReleases.slice(sheetIdx * size, (sheetIdx + 1) * size);
   };
 
-  const handlePrint = () => openPrintWindow({ selectedReleases, template, fields, fieldOrder, pad, fontScale, qrScale, layoutMode, tracklistMap });
+  const handlePrint = () => openPrintWindow({ selectedReleases, template, fields, fieldOrder, pad, fontScale, qrScale, layoutMode, tracklistMap, col2Fields });
 
-  const sheetProps = { template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap };
+  const sheetProps = { template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields };
 
   const unfetchedCount = selectedReleases.filter((r) => r.releaseId && tracklistMap[r.releaseId] === undefined).length;
 
@@ -159,7 +159,7 @@ export default function PreviewScreen({
                   style={{ border: "none", background: "transparent", fontSize: 12, color: "#111", fontFamily: "inherit", cursor: "pointer", outline: "none" }}
                 >
                   <option value="single">Standard</option>
-                  <option value="twoColumn">Split (tracklist)</option>
+                  <option value="twoColumn">Two Column</option>
                 </select>
               </div>
             </div>
@@ -167,10 +167,11 @@ export default function PreviewScreen({
 
           {/* Fields tab */}
           {controlTab === "fields" && (
-            <div style={{ padding: "8px 20px 10px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              {fieldOrder
-                .filter((key) => inputMode === "csv" || !csvOnlyCols.includes(key))
-                .map((key) => {
+            <div style={{ padding: "8px 20px 10px" }}>
+              {(() => {
+                const colLabelStyle = { fontSize: 10, color: "#999", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", whiteSpace: "nowrap", flexShrink: 0 };
+
+                const renderFieldButton = (key) => {
                   const f = fields[key];
                   return (
                     <button
@@ -183,6 +184,17 @@ export default function PreviewScreen({
                         const from = dragField.current;
                         if (!from || from === key || dragOverField.current === key) return;
                         dragOverField.current = key;
+                        if (layoutMode === "twoColumn") {
+                          const fromInCol2 = col2Fields.has(from);
+                          const toInCol2 = col2Fields.has(key);
+                          if (fromInCol2 !== toInCol2) {
+                            setCol2Fields((prev) => {
+                              const next = new Set(prev);
+                              if (toInCol2) next.add(from); else next.delete(from);
+                              return next;
+                            });
+                          }
+                        }
                         reorderFields(from, key);
                       }}
                       onDragEnd={() => { dragField.current = null; dragOverField.current = null; setDraggingKey(null); }}
@@ -203,6 +215,17 @@ export default function PreviewScreen({
                         const from = touchDrag.current.key;
                         if (!to || to === from || to === touchDrag.current.lastOver) return;
                         touchDrag.current.lastOver = to;
+                        if (layoutMode === "twoColumn") {
+                          const fromInCol2 = col2Fields.has(from);
+                          const toInCol2 = col2Fields.has(to);
+                          if (fromInCol2 !== toInCol2) {
+                            setCol2Fields((prev) => {
+                              const next = new Set(prev);
+                              if (toInCol2) next.add(from); else next.delete(from);
+                              return next;
+                            });
+                          }
+                        }
                         reorderFields(from, to);
                       }}
                       onTouchEnd={() => { touchDrag.current = null; setDraggingKey(null); }}
@@ -230,11 +253,61 @@ export default function PreviewScreen({
                       {f.label}
                     </button>
                   );
-                })}
+                };
+
+                const visibleKeys = fieldOrder.filter((key) => inputMode === "csv" || !csvOnlyCols.includes(key));
+
+                if (layoutMode === "twoColumn") {
+                  const col1Keys = visibleKeys.filter((k) => !col2Fields.has(k));
+                  const col2Keys = visibleKeys.filter((k) => col2Fields.has(k));
+                  return (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minHeight: 30 }}>
+                        <span style={colLabelStyle}>Col 1</span>
+                        {col1Keys.map(renderFieldButton)}
+                      </div>
+                      <div
+                        style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minHeight: 30, borderTop: "1px dashed #e8e8e8", paddingTop: 6 }}
+                        onDragOver={(e) => {
+                          if (e.target !== e.currentTarget) return;
+                          e.preventDefault();
+                          const from = dragField.current;
+                          if (!from || col2Fields.has(from)) return;
+                          setCol2Fields((prev) => new Set([...prev, from]));
+                        }}
+                      >
+                        <span style={colLabelStyle}>Col 2</span>
+                        {col2Keys.map(renderFieldButton)}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    {visibleKeys.map(renderFieldButton)}
+                  </div>
+                );
+              })()}
 
               {fields.tracklist?.on && (
-                <>
-                  <div style={{ width: 1, height: 20, background: "#e0e0e0", alignSelf: "center", flexShrink: 0 }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+                  <div style={{ width: 1, height: 20, background: "#e0e0e0", flexShrink: 0 }} />
+                  <button
+                    onClick={() => setFields((prev) => ({
+                      ...prev,
+                      tracklist: { ...prev.tracklist, showDuration: !prev.tracklist.showDuration },
+                    }))}
+                    style={{
+                      padding: "4px 9px", borderRadius: 6, fontSize: 11, fontWeight: 500,
+                      border: `1px solid ${fields.tracklist.showDuration ? "#1a6ef5" : "#e0e0e0"}`,
+                      background: fields.tracklist.showDuration ? "#eff6ff" : "#fafafa",
+                      color: fields.tracklist.showDuration ? "#1a6ef5" : "#aaa",
+                      cursor: "pointer", whiteSpace: "nowrap",
+                    }}
+                  >
+                    Duration
+                  </button>
                   {fetchProgress ? (
                     <span style={{ fontSize: 11, color: fetchProgress.waiting ? "#e09000" : "#888", whiteSpace: "nowrap" }}>
                       {fetchProgress.waiting
@@ -250,7 +323,7 @@ export default function PreviewScreen({
                       {unfetchedCount > 0 ? `↓ Fetch Tracklists (${unfetchedCount})` : "✓ All fetched"}
                     </button>
                   )}
-                </>
+                </div>
               )}
             </div>
           )}

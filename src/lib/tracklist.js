@@ -9,11 +9,16 @@ export class RateLimitError extends Error {
   }
 }
 
+// Converts the raw Discogs API tracklist array to an array of {pos, title, duration} objects.
+// Headings (e.g. "Side A") are stripped — only playable tracks are included.
 export function formatTracklist(tracks) {
   return (tracks || [])
     .filter((t) => t.type_ !== "heading" && t.title)
-    .map((t) => (t.position ? `${t.position} ${t.title}` : t.title))
-    .join("\n");
+    .map((t) => ({
+      pos:      t.position || "",
+      title:    t.title,
+      duration: t.duration || "",
+    }));
 }
 
 // Throws RateLimitError on 429 or network-level block

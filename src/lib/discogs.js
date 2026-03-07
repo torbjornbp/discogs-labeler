@@ -67,6 +67,8 @@ export function parseDiscogsCSV(text) {
   const iNotes      = idx("Collection Notes");
   const iRating     = idx("Rating");
 
+  // Hand-rolled CSV parser to handle quoted fields and escaped quotes ("").
+  // A simple split(",") would break on commas inside quoted values (e.g. "Smith, John").
   function parseRow(line) {
     const fields = [];
     let cur = "", inQuote = false;
