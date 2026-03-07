@@ -276,8 +276,11 @@ export default function PreviewScreen({
                 }
 
                 return (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    {visibleKeys.map(renderFieldButton)}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      {visibleKeys.map(renderFieldButton)}
+                    </div>
+                    <span style={{ fontSize: 11, color: "#aaa" }}>Drag to reorder</span>
                   </div>
                 );
               })()}
