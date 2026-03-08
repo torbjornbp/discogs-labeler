@@ -61,6 +61,8 @@ export default function PreviewScreen({
 
   const unfetchedCount = selectedReleases.filter((r) => r.releaseId && tracklistMap[r.releaseId] === undefined).length;
 
+  const selectStyle = { border: "none", background: "transparent", fontSize: 12, color: "#000", fontFamily: "inherit", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none" };
+
   const handleFetchTracklists = () => {
     if (fetchProgress) return;
     setFetchProgress({ done: 0, total: unfetchedCount, waiting: null });
@@ -119,7 +121,7 @@ export default function PreviewScreen({
                 <select
                   value={template.id}
                   onChange={(e) => setTemplate(TEMPLATES.find((t) => t.id === e.target.value))}
-                  style={{ border: "none", background: "transparent", fontSize: 12, color: "#000", fontFamily: "inherit", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none" }}
+                  style={selectStyle}
                 >
                   {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.name} — {t.description}</option>)}
                 </select>
@@ -149,7 +151,7 @@ export default function PreviewScreen({
                 <select
                   value={layoutMode}
                   onChange={(e) => setLayoutMode(e.target.value)}
-                  style={{ border: "none", background: "transparent", fontSize: 12, color: "#000", fontFamily: "inherit", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none" }}
+                  style={selectStyle}
                 >
                   <option value="single">Standard</option>
                   <option value="twoColumn">Two Column</option>
@@ -296,7 +298,7 @@ export default function PreviewScreen({
                       tracklist: { ...prev.tracklist, showDuration: !prev.tracklist.showDuration },
                     }))}
                     style={{
-                      padding: "4px 9px", fontSize: 11, fontWeight: 500,
+                      padding: "4px 9px", fontSize: 11, fontWeight: 700,
                       border: `1px solid ${fields.tracklist.showDuration ? "royalblue" : "#aaa"}`,
                       background: fields.tracklist.showDuration ? "royalblue" : "#f9f9f9",
                       color: fields.tracklist.showDuration ? "#fff" : "#777",
@@ -316,7 +318,7 @@ export default function PreviewScreen({
                     <button
                       onClick={handleFetchTracklists}
                       disabled={unfetchedCount === 0}
-                      style={{ padding: "4px 9px", fontSize: 11, whiteSpace: "nowrap", border: "1px solid #bbb", borderRadius: 4, cursor: "pointer", background: "#fff", fontFamily: "inherit" }}
+                      style={{ padding: "4px 9px", fontSize: 11, whiteSpace: "nowrap", border: "1px solid #bbb", cursor: "pointer", background: "#fff", fontFamily: "inherit", boxShadow: "2px 2px #ddd" }}
                     >
                       {unfetchedCount > 0 ? `↓ Fetch Tracklists (${unfetchedCount})` : "✓ All fetched"}
                     </button>
