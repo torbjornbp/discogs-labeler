@@ -81,7 +81,7 @@ export default function PreviewScreen({
           <span style={{ fontSize: 14, fontWeight: 700, color: "#000" }}>Label Preview</span>
           <span style={{ fontSize: 13, color: "#777" }}>{selectedReleases.length} labels · {sheetsNeeded} sheet{sheetsNeeded !== 1 ? "s" : ""}</span>
           {sortKey && (
-            <span className="box" style={{ fontSize: 12, color: "#555", padding: "4px 8px" }}>
+            <span className="box" style={{ fontSize: 12, color: "#555", padding: "5px 10px", boxShadow: "none" }}>
               Sorted by <strong style={{ color: "#000" }}>{COLUMNS.find((c) => c.key === sortKey)?.label}</strong> {sortDir === "asc" ? "↑" : "↓"}
             </span>
           )}
