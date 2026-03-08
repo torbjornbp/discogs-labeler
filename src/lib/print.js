@@ -17,7 +17,7 @@ function buildTextField(key, r, tracklist, fields, fmm) {
       return `<div style="display:flex;align-items:baseline;font-size:${fmm(s.mmSize || 1.6)}mm;font-family:monospace;color:${s.color || "#555"};line-height:1.3;flex-shrink:0;"><div style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${label}</div>${dur}</div>`;
     }).join("");
   }
-  const fontFamily = s.mono ? "monospace" : "'Inter',sans-serif";
+  const fontFamily = s.mono ? "monospace" : "'Iosevka Aile',Arial,sans-serif";
   const notesPrefix = key === "notes" ? '<span style="font-weight:700;font-style:normal;">Notes: </span>' : "";
   return `<div style="font-size:${fmm(s.mmSize || 2)}mm;font-weight:${s.weight || 400};font-family:${fontFamily};color:${s.color || "#888"};line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:${s.clamp || 1};-webkit-box-orient:vertical;${s.italic ? "font-style:italic;" : ""}flex-shrink:0;">${notesPrefix}${val}</div>`;
 }
