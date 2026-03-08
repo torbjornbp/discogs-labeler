@@ -6,7 +6,7 @@ export const QR_API = (data) =>
 export const QR_API_PRINT = (data) =>
   `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(data)}&bgcolor=ffffff&color=111111&margin=2`;
 
-const MM = 3.7795;
+export const MM = 3.7795;
 
 function makeTemplate(t) {
   return {

@@ -1,7 +1,5 @@
-import { QR_API } from "../lib/templates.js";
+import { QR_API, MM } from "../lib/templates.js";
 import { FIELD_STYLES, FIELD_VALUE } from "../lib/fields.js";
-
-const MM = 3.7795;
 
 export default function LabelCell({ release, template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields }) {
   const fs = (n) => n * (fontScale || 1);
@@ -35,7 +33,7 @@ export default function LabelCell({ release, template, fields, fontScale, qrScal
       return (
         <div key={key} style={{ overflow: "hidden", flexShrink: 0 }}>
           {val.map(({ pos, title, duration }, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "baseline", fontSize: fs(s.size), fontFamily: "monospace", color: s.color, lineHeight: 1.3 }}>
+            <div key={i} style={{ display: "flex", alignItems: "baseline", fontSize: fs(s.size), fontFamily: s.mono ? "monospace" : "inherit", color: s.color, lineHeight: 1.3 }}>
               <div style={{ flex: 1, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
                 {pos}{pos ? " " : ""}{title}
               </div>
@@ -53,7 +51,7 @@ export default function LabelCell({ release, template, fields, fontScale, qrScal
       <div key={key} style={{
         fontSize: fs(s.size || 7),
         fontWeight: s.weight || 400,
-        fontFamily: s.mono ? "monospace" : "'Inter', sans-serif",
+        fontFamily: s.mono ? "monospace" : "'Iosevka Aile', Arial, sans-serif",
         color: s.color || "#888",
         fontStyle: s.italic ? "italic" : "normal",
         lineHeight: 1.25,
