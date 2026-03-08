@@ -78,7 +78,7 @@ input, button { font-family: inherit; }
 .record-table th, .record-table td { border: 1px dotted #777; }
 .record-table thead tr { background: #eee; }
 th.sortable { cursor: pointer; user-select: none; }
-th.sortable:hover { background: #eee; }
+th.sortable:hover { background: #e0e0e0; }
 th.sortable.active { color: royalblue; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
