@@ -45,8 +45,8 @@ export default function PrintSheet({ releases, template, fields, fontScale, qrSc
               style={{
                 width: template.labelW,
                 height: template.labelH,
-                borderRight: "0.5px dashed #ddd",
-                borderBottom: "0.5px dashed #ddd",
+                borderRight: "0.5px dashed #ccc",
+                borderBottom: "0.5px dashed #ccc",
               }}
             />
           )
