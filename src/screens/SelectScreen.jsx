@@ -46,7 +46,7 @@ export default function SelectScreen({
           value={searchQ}
           onChange={(e) => setSearchQ(e.target.value)}
           placeholder="Search artist, title, year…"
-          style={{ padding: "6px 10px", background: "#fff", border: "1px solid #aaa", color: "#000", fontSize: 13, outline: "none", width: 220, marginLeft: "auto" }}
+          style={{ padding: "5px 10px", background: "#fff", border: "1px solid #aaa", color: "#000", fontSize: 13, outline: "none", width: 220, marginLeft: "auto" }}
           onFocus={(e) => (e.target.style.borderColor = "royalblue")}
           onBlur={(e) => (e.target.style.borderColor = "#aaa")}
         />

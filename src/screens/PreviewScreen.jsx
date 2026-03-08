@@ -84,7 +84,7 @@ export default function PreviewScreen({
             </span>
           )}
           <div style={{ marginLeft: "auto" }} />
-          <button className="btn-primary" onClick={handlePrint} style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 18px", whiteSpace: "nowrap" }}>
+          <button className="btn-primary" onClick={handlePrint} style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 18px", whiteSpace: "nowrap" }}>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
               <rect x="3" y="6" width="10" height="7" rx="1" stroke="currentColor" strokeWidth="1.5"/>
               <path d="M5 6V3h6v3" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
@@ -113,16 +113,17 @@ export default function PreviewScreen({
 
           {/* Layout tab */}
           {controlTab === "layout" && (
-            <div style={{ padding: "8px 20px 10px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ padding: "8px 20px 10px", display: "flex", alignItems: "stretch", gap: 10, flexWrap: "wrap" }}>
               <div className="box" style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px" }}>
                 <span style={{ fontSize: 11, color: "#777", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", whiteSpace: "nowrap" }}>Template</span>
                 <select
                   value={template.id}
                   onChange={(e) => setTemplate(TEMPLATES.find((t) => t.id === e.target.value))}
-                  style={{ border: "none", background: "transparent", fontSize: 12, color: "#000", fontFamily: "inherit", cursor: "pointer", outline: "none" }}
+                  style={{ border: "none", background: "transparent", fontSize: 12, color: "#000", fontFamily: "inherit", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none" }}
                 >
                   {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.name} — {t.description}</option>)}
                 </select>
+                <span style={{ fontSize: 10, color: "#777", lineHeight: 1, pointerEvents: "none", userSelect: "none" }}>▾</span>
               </div>
 
               <div className="box" style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px" }}>
@@ -148,11 +149,12 @@ export default function PreviewScreen({
                 <select
                   value={layoutMode}
                   onChange={(e) => setLayoutMode(e.target.value)}
-                  style={{ border: "none", background: "transparent", fontSize: 12, color: "#000", fontFamily: "inherit", cursor: "pointer", outline: "none" }}
+                  style={{ border: "none", background: "transparent", fontSize: 12, color: "#000", fontFamily: "inherit", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none" }}
                 >
                   <option value="single">Standard</option>
                   <option value="twoColumn">Two Column</option>
                 </select>
+                <span style={{ fontSize: 10, color: "#777", lineHeight: 1, pointerEvents: "none", userSelect: "none" }}>▾</span>
               </div>
             </div>
           )}
@@ -312,10 +314,9 @@ export default function PreviewScreen({
                     </span>
                   ) : (
                     <button
-                      className="btn"
                       onClick={handleFetchTracklists}
                       disabled={unfetchedCount === 0}
-                      style={{ padding: "4px 9px", fontSize: 11, whiteSpace: "nowrap" }}
+                      style={{ padding: "4px 9px", fontSize: 11, whiteSpace: "nowrap", border: "1px solid #bbb", borderRadius: 4, cursor: "pointer", background: "#fff", fontFamily: "inherit" }}
                     >
                       {unfetchedCount > 0 ? `↓ Fetch Tracklists (${unfetchedCount})` : "✓ All fetched"}
                     </button>
