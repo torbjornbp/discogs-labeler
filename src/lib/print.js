@@ -1,4 +1,4 @@
-import { QR_API_PRINT, FONT_FAMILY } from "./templates.js";
+import { QR_API_PRINT, FONT_FAMILY, QR_BASE_MM } from "./templates.js";
 import { FIELD_STYLES, FIELD_VALUE } from "./fields.js";
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -34,7 +34,7 @@ function buildLabel(r, { template, fields, fieldOrder, pad, fontScale, qrScale, 
   const qr = QR_API_PRINT(r.url);
   const fmm = (n) => (n * (fontScale || 1)).toFixed(2);
   const showQR = fieldOrder.includes("qr") && fields.qr.on;
-  const qrSizeMm = (20 * (qrScale || 1)).toFixed(1);
+  const qrSizeMm = (QR_BASE_MM * (qrScale || 1)).toFixed(1);
   const tracklist = tracklistMap?.[r.releaseId] || [];
   const qrHTML = showQR ? `<div style="flex-shrink:0;"><img src="${qr}" style="display:block;width:${qrSizeMm}mm;height:${qrSizeMm}mm;" /></div>` : "";
   const outerStyle = `width:${template.labelWmm}mm;height:${template.labelHmm}mm;display:flex;flex-direction:row;align-items:flex-start;padding:${pad.t}mm ${pad.r}mm ${pad.b}mm ${pad.l}mm;box-sizing:border-box;gap:1.5mm;background:#fff;overflow:hidden;`;
@@ -98,11 +98,15 @@ export function openPrintWindow({ selectedReleases, template, fields, fieldOrder
   const url = URL.createObjectURL(blob);
   const win = window.open(url, "_blank", "width=900,height=700");
   if (!win) { URL.revokeObjectURL(url); alert("Popup blocked — please allow popups for this page and try again."); return; }
-  win.onload = () => {
+
+  let revoked = false;
+  const cleanup = () => { if (!revoked) { revoked = true; URL.revokeObjectURL(url); } };
+
+  const afterLoad = () => {
     const imgs = win.document.images;
     let loaded = 0;
     const total = imgs.length;
-    const done = () => { win.print(); URL.revokeObjectURL(url); };
+    const done = () => { win.print(); cleanup(); };
     if (total === 0) { done(); return; }
     const tryPrint = () => { if (++loaded >= total) done(); };
     Array.from(imgs).forEach((img) => {
@@ -110,4 +114,8 @@ export function openPrintWindow({ selectedReleases, template, fields, fieldOrder
       else { img.onload = tryPrint; img.onerror = tryPrint; }
     });
   };
+
+  win.addEventListener("beforeunload", cleanup);
+  if (win.document.readyState === "complete") afterLoad();
+  else win.onload = afterLoad;
 }
