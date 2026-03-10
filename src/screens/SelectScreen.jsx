@@ -50,7 +50,7 @@ export default function SelectScreen({
           onFocus={(e) => (e.target.style.borderColor = "royalblue")}
           onBlur={(e) => (e.target.style.borderColor = "#aaa")}
         />
-        <button className="btn" onClick={() => selectAll(filteredReleases)}>All</button>
+        <button className="btn" onClick={() => selectAll(filteredReleases)}>{filteredReleases.length < releases.length ? `All (${filteredReleases.length})` : "All"}</button>
         <button className="btn" onClick={clearAll}>None</button>
         <span style={{ fontSize: 12, color: "royalblue", fontWeight: 700, fontFamily: "monospace", padding: "6px 10px", background: "#f9f9f9", border: "1px solid #aaa" }}>{selected.size} selected</span>
         {sortKey && (
@@ -119,7 +119,7 @@ export default function SelectScreen({
                   </td>
                   <td style={{ padding: "4px 8px", width: 48 }}>
                     {r.thumb
-                      ? <img src={r.thumb} alt="" style={{ width: 36, height: 36, objectFit: "cover", display: "block", background: "#f0f0f0" }} />
+                      ? <img src={r.thumb} alt="" style={{ width: 36, height: 36, objectFit: "cover", display: "block", background: "#f0f0f0" }} onError={(e) => { e.currentTarget.style.display = "none"; }} />
                       : <div style={{ width: 36, height: 36, background: "#f0f0f0" }} />
                     }
                   </td>
