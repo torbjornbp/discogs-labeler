@@ -23,18 +23,23 @@ export function formatTracklist(tracks) {
 
 // Throws RateLimitError on 429 or network-level block
 export async function fetchReleaseTracklist(releaseId) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
   let res;
   try {
     res = await fetch(`${DISCOGS_API}/releases/${releaseId}`, {
       headers: { "User-Agent": "DiscogsLabelPrinter/1.0" },
+      signal: controller.signal,
     });
   } catch {
-    // TCP-level block from Discogs hard rate-limit
+    // TCP-level block from Discogs hard rate-limit — wait for full window reset
     throw new RateLimitError(60);
+  } finally {
+    clearTimeout(timeout);
   }
   if (res.status === 429) {
-    const wait = parseInt(res.headers.get("Retry-After") || "5", 10);
-    throw new RateLimitError(wait);
+    const wait = parseInt(res.headers.get("Retry-After") || "60", 10);
+    throw new RateLimitError(Math.max(wait, 60));
   }
   if (!res.ok) return "";
   const data = await res.json();
