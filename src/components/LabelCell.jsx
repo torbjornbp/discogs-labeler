@@ -1,4 +1,4 @@
-import { QR_API, MM } from "../lib/templates.js";
+import { QR_API, MM, FONT_FAMILY } from "../lib/templates.js";
 import { FIELD_STYLES, FIELD_VALUE } from "../lib/fields.js";
 
 export default function LabelCell({ release, template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields }) {
@@ -51,7 +51,7 @@ export default function LabelCell({ release, template, fields, fontScale, qrScal
       <div key={key} style={{
         fontSize: fs(s.size || 7),
         fontWeight: s.weight || 400,
-        fontFamily: s.mono ? "monospace" : "'Iosevka Aile', Arial, sans-serif",
+        fontFamily: s.mono ? "monospace" : FONT_FAMILY,
         color: s.color || "#888",
         fontStyle: s.italic ? "italic" : "normal",
         lineHeight: 1.25,

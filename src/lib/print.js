@@ -1,5 +1,7 @@
-import { QR_API_PRINT } from "./templates.js";
+import { QR_API_PRINT, FONT_FAMILY } from "./templates.js";
 import { FIELD_STYLES, FIELD_VALUE } from "./fields.js";
+
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 function buildTextField(key, r, tracklist, fields, fmm) {
   if (!fields[key]?.on) return "";
@@ -10,16 +12,16 @@ function buildTextField(key, r, tracklist, fields, fmm) {
     if (!val.length) return "";
     const showDur = fields.tracklist?.showDuration;
     return val.map(({ pos, title, duration }) => {
-      const label = pos ? `${pos} ${title}` : title;
+      const label = esc(pos ? `${pos} ${title}` : title);
       const dur = showDur && duration
-        ? `<div style="flex-shrink:0;padding-left:1mm;opacity:0.7;">(${duration})</div>`
+        ? `<div style="flex-shrink:0;padding-left:1mm;opacity:0.7;">(${esc(duration)})</div>`
         : "";
       return `<div style="display:flex;align-items:baseline;font-size:${fmm(s.mmSize || 1.6)}mm;font-family:monospace;color:${s.color || "#555"};line-height:1.3;flex-shrink:0;"><div style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${label}</div>${dur}</div>`;
     }).join("");
   }
-  const fontFamily = s.mono ? "monospace" : "'Iosevka Aile',Arial,sans-serif";
+  const fontFamily = s.mono ? "monospace" : FONT_FAMILY;
   const notesPrefix = key === "notes" ? '<span style="font-weight:700;font-style:normal;">Notes: </span>' : "";
-  return `<div style="font-size:${fmm(s.mmSize || 2)}mm;font-weight:${s.weight || 400};font-family:${fontFamily};color:${s.color || "#888"};line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:${s.clamp || 1};-webkit-box-orient:vertical;${s.italic ? "font-style:italic;" : ""}flex-shrink:0;">${notesPrefix}${val}</div>`;
+  return `<div style="font-size:${fmm(s.mmSize || 2)}mm;font-weight:${s.weight || 400};font-family:${fontFamily};color:${s.color || "#888"};line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:${s.clamp || 1};-webkit-box-orient:vertical;${s.italic ? "font-style:italic;" : ""}flex-shrink:0;">${notesPrefix}${esc(val)}</div>`;
 }
 
 // Generates the HTML string for a single label.
