@@ -31,6 +31,7 @@ export default function HomeScreen({ inputMode, setInputMode, username, setUsern
           {inputMode === "username" && (
             <div>
               <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#777", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Discogs Username</label>
+              <p style={{ fontSize: 12, color: "#999", marginBottom: 10, lineHeight: 1.5 }}>For large collections, CSV Upload is faster and more reliable.</p>
               <input
                 ref={inputRef}
                 value={username}
