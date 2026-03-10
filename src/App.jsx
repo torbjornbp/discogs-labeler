@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { TEMPLATES } from "./lib/templates.js";
 import { LS } from "./lib/storage.js";
 import { fetchAllReleases, formatRelease, parseDiscogsCSV, sortReleases } from "./lib/discogs.js";
@@ -46,7 +46,12 @@ export default function App() {
   };
   const [fields, setFields] = useState(() => {
     const saved = LS.get("fields", null);
-    return saved ? { ...defaultFields, ...saved } : defaultFields;
+    if (!saved) return defaultFields;
+    const merged = { ...defaultFields };
+    for (const key of Object.keys(merged)) {
+      if (saved[key]) merged[key] = { ...merged[key], ...saved[key] };
+    }
+    return merged;
   });
   const [layoutMode, setLayoutMode] = useState(() => LS.get("layoutMode", "single"));
   // Set of field keys assigned to the right column in twoColumn layout mode.
@@ -54,6 +59,7 @@ export default function App() {
   const [col2Fields, setCol2Fields] = useState(() => new Set(LS.get("col2Fields", ["tracklist"])));
   const [tracklistMap, setTracklistMap] = useState({});
   const cancelTracklistRef = useRef(false);
+  const fetchAbortRef = useRef(null);
   const [inputMode, setInputMode] = useState("username");
   const [sortKey, setSortKey] = useState(() => LS.get("sortKey", null));
   const [sortDir, setSortDir] = useState(() => LS.get("sortDir", "asc"));
@@ -69,23 +75,23 @@ export default function App() {
   useEffect(() => { LS.set("layoutMode", layoutMode); }, [layoutMode]);
   useEffect(() => { LS.set("col2Fields", [...col2Fields]); }, [col2Fields]);
 
-  const sortedReleases = sortReleases(releases, sortKey, sortDir);
+  const sortedReleases = useMemo(() => sortReleases(releases, sortKey, sortDir), [releases, sortKey, sortDir]);
   const selectedReleases = sortedReleases.filter((r) => selected.has(r.id));
 
   function handleSortClick(key) {
-    setSortKey((prev) => {
-      if (prev === key) {
-        if (sortDir === "asc") { setSortDir("desc"); return key; }
-        else { setSortDir("asc"); return null; }
-      } else {
-        setSortDir("asc");
-        return key;
-      }
-    });
+    if (sortKey === key) {
+      if (sortDir === "asc") { setSortDir("desc"); }
+      else { setSortKey(null); setSortDir("asc"); }
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
   }
 
   async function handleFetch() {
     if (!username.trim()) return;
+    const abort = new AbortController();
+    fetchAbortRef.current = abort;
     setError("");
     setScreen("loading");
     setLoadingMsg("Connecting to Discogs…");
@@ -95,16 +101,22 @@ export default function App() {
         setLoadingMsg(status
           ? `Page ${page}/${total ?? "?"} — ${status}`
           : `Fetching your collection… (page ${page}/${total ?? "?"}, ${count} releases)`);
-      });
+      }, abort.signal);
       if (raw.length === 0) throw new Error("Collection is empty or private.");
       const formatted = raw.map(formatRelease);
       setReleases(formatted);
       setSelected(new Set());
       setScreen("select");
     } catch (e) {
+      if (e.name === "AbortError") return;
       setError(e.message || "Failed to fetch collection.");
       setScreen("home");
     }
+  }
+
+  function cancelFetch() {
+    fetchAbortRef.current?.abort();
+    setScreen("home");
   }
 
   function handleCSV(file) {
@@ -203,6 +215,7 @@ export default function App() {
         <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, background: "#fff" }}>
           <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid #e0e0e0", borderTop: "3px solid royalblue", animation: "spin 0.8s linear infinite" }} />
           <p style={{ color: "#666666", fontSize: 14, textAlign: "center" }}>{loadingMsg}</p>
+          <button className="btn" onClick={cancelFetch}>Cancel</button>
         </div>
       )}
 
