@@ -2,6 +2,9 @@ export const DISCOGS_API = "https://api.discogs.com";
 
 export const FONT_FAMILY = "'Iosevka Aile', Arial, sans-serif";
 
+export const QR_BASE_PX = 76;   // preview size at 96dpi
+export const QR_BASE_MM = 20;   // print size in mm
+
 export const QR_API = (data) =>
   `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(data)}&bgcolor=ffffff&color=111111&margin=2`;
 

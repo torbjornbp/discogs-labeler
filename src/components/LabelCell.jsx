@@ -1,4 +1,4 @@
-import { QR_API, MM, FONT_FAMILY } from "../lib/templates.js";
+import { QR_API, MM, FONT_FAMILY, QR_BASE_PX } from "../lib/templates.js";
 import { FIELD_STYLES, FIELD_VALUE } from "../lib/fields.js";
 
 export default function LabelCell({ release, template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields }) {
@@ -77,7 +77,7 @@ export default function LabelCell({ release, template, fields, fontScale, qrScal
       <div style={outerStyle}>
         {showQR && (
           <div style={{ flexShrink: 0 }}>
-            <img src={qrUrl} alt="QR" style={{ width: 76 * (qrScale || 1), height: 76 * (qrScale || 1), display: "block" }} crossOrigin="anonymous" />
+            <img src={qrUrl} alt="QR" style={{ width: QR_BASE_PX * (qrScale || 1), height: QR_BASE_PX * (qrScale || 1), display: "block" }} crossOrigin="anonymous" />
           </div>
         )}
         <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "flex-start", gap: 2, maxHeight: template.labelH - pad.t * MM - pad.b * MM, overflow: "hidden" }}>
@@ -97,7 +97,7 @@ export default function LabelCell({ release, template, fields, fontScale, qrScal
     <div style={outerStyle}>
       {showQR && (
         <div style={{ flexShrink: 0 }}>
-          <img src={qrUrl} alt="QR" style={{ width: 76 * (qrScale || 1), height: 76 * (qrScale || 1), display: "block" }} crossOrigin="anonymous" />
+          <img src={qrUrl} alt="QR" style={{ width: QR_BASE_PX * (qrScale || 1), height: QR_BASE_PX * (qrScale || 1), display: "block" }} crossOrigin="anonymous" />
         </div>
       )}
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "flex-start", gap: 2, maxHeight: template.labelH - pad.t * MM - pad.b * MM, overflow: "hidden" }}>
