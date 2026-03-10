@@ -41,7 +41,7 @@ export async function fetchReleaseTracklist(releaseId) {
     const wait = parseInt(res.headers.get("Retry-After") || "60", 10);
     throw new RateLimitError(Math.max(wait, 60));
   }
-  if (!res.ok) return "";
+  if (!res.ok) return [];
   const data = await res.json();
   return formatTracklist(data.tracklist);
 }
