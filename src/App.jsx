@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TEMPLATES } from "./lib/templates.js";
 import { LS } from "./lib/storage.js";
 import { fetchAllReleases, formatRelease, parseDiscogsCSV, sortReleases } from "./lib/discogs.js";
@@ -53,6 +53,7 @@ export default function App() {
   // Stored as an array in localStorage (Set is not JSON-serializable).
   const [col2Fields, setCol2Fields] = useState(() => new Set(LS.get("col2Fields", ["tracklist"])));
   const [tracklistMap, setTracklistMap] = useState({});
+  const cancelTracklistRef = useRef(false);
   const [inputMode, setInputMode] = useState("username");
   const [sortKey, setSortKey] = useState(() => LS.get("sortKey", null));
   const [sortDir, setSortDir] = useState(() => LS.get("sortDir", "asc"));
@@ -153,9 +154,11 @@ export default function App() {
   }
 
   async function fetchTracklists(releases, onProgress) {
+    cancelTracklistRef.current = false;
     const toFetch = releases.filter((r) => r.releaseId && tracklistMap[r.releaseId] === undefined);
     if (toFetch.length === 0) { onProgress(0, 0); return; }
     for (let i = 0; i < toFetch.length; i++) {
+      if (cancelTracklistRef.current) break;
       let attempts = 0;
       while (attempts < 4) {
         try {
@@ -173,11 +176,13 @@ export default function App() {
         }
       }
       onProgress(i + 1, toFetch.length, null);
-      if (i < toFetch.length - 1) await sleep(3000);
+      if (i < toFetch.length - 1 && !cancelTracklistRef.current) await sleep(3000);
     }
   }
 
-  const labelConfig = { fields, setFields, fieldOrder, setFieldOrder, fontScale, setFontScale, qrScale, setQrScale, pad, setPad, layoutMode, setLayoutMode, col2Fields, setCol2Fields, tracklistMap };
+  function cancelTracklists() { cancelTracklistRef.current = true; }
+
+  const labelConfig = { fields, setFields, fieldOrder, setFieldOrder, fontScale, setFontScale, qrScale, setQrScale, pad, setPad, layoutMode, setLayoutMode, col2Fields, setCol2Fields, tracklistMap, cancelTracklists };
 
   return (
     <div style={{ width: "100vw", minHeight: "100vh", overflowX: "hidden" }}>

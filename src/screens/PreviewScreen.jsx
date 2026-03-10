@@ -17,7 +17,7 @@ export default function PreviewScreen({
   inputMode,
   setScreen,
 }) {
-  const { fields, setFields, fieldOrder, setFieldOrder, fontScale, setFontScale, qrScale, setQrScale, pad, setPad, layoutMode, setLayoutMode, col2Fields, setCol2Fields, tracklistMap } = labelConfig;
+  const { fields, setFields, fieldOrder, setFieldOrder, fontScale, setFontScale, qrScale, setQrScale, pad, setPad, layoutMode, setLayoutMode, col2Fields, setCol2Fields, tracklistMap, cancelTracklists } = labelConfig;
   const [fetchProgress, setFetchProgress] = useState(null);
   const [draggingKey, setDraggingKey] = useState(null);
   const dragField = useRef(null);
@@ -309,11 +309,19 @@ export default function PreviewScreen({
                     Duration
                   </button>
                   {fetchProgress ? (
-                    <span style={{ fontSize: 11, color: fetchProgress.waiting ? "#e09000" : "#777", whiteSpace: "nowrap" }}>
-                      {fetchProgress.waiting
-                        ? `Rate limited — waiting ${fetchProgress.waiting}s…`
-                        : `Fetching ${fetchProgress.done}/${fetchProgress.total}…`}
-                    </span>
+                    <>
+                      <span style={{ fontSize: 11, color: fetchProgress.waiting ? "#e09000" : "#777", whiteSpace: "nowrap" }}>
+                        {fetchProgress.waiting
+                          ? `Rate limited — waiting ${fetchProgress.waiting}s…`
+                          : `Fetching ${fetchProgress.done}/${fetchProgress.total}…`}
+                      </span>
+                      <button
+                        onClick={() => { cancelTracklists(); setFetchProgress(null); }}
+                        style={{ padding: "4px 9px", fontSize: 11, whiteSpace: "nowrap", border: "1px solid #bbb", cursor: "pointer", background: "#fff", fontFamily: "inherit", boxShadow: "2px 2px #ddd" }}
+                      >
+                        ✕ Cancel
+                      </button>
+                    </>
                   ) : (
                     <button
                       onClick={handleFetchTracklists}
