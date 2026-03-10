@@ -46,10 +46,12 @@ input, button { font-family: inherit; }
   border: 1px solid #aaa;
   box-shadow: 2px 2px #ddd;
   background: #f9f9f9;
-  padding: 5px 10px;
+  padding: 0 10px;
+  height: 27px;
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
+  line-height: 1;
   color: #000;
 }
 .btn:hover { background: royalblue; color: white; border-color: royalblue; box-shadow: 2px 2px #ddd; }
@@ -60,10 +62,12 @@ input, button { font-family: inherit; }
   box-shadow: 2px 2px #ddd;
   background: royalblue;
   color: white;
-  padding: 5px 10px;
+  padding: 0 10px;
+  height: 27px;
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
+  line-height: 1;
   font-weight: 700;
 }
 .btn-primary:hover { background: #2a2aff; border-color: #2a2aff; }

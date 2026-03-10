@@ -46,13 +46,13 @@ export default function SelectScreen({
           value={searchQ}
           onChange={(e) => setSearchQ(e.target.value)}
           placeholder="Search artist, title, year…"
-          style={{ padding: "5px 10px", background: "#fff", border: "1px solid #aaa", color: "#000", fontSize: 13, outline: "none", width: 220, marginLeft: "auto" }}
+          style={{ padding: "0 10px", height: 27, background: "#fff", border: "1px solid #aaa", color: "#000", fontSize: 13, lineHeight: 1, outline: "none", width: 220, marginLeft: "auto", WebkitAppearance: "none", appearance: "none" }}
           onFocus={(e) => (e.target.style.borderColor = "royalblue")}
           onBlur={(e) => (e.target.style.borderColor = "#aaa")}
         />
         <button className="btn" onClick={() => selectAll(filteredReleases)}>{filteredReleases.length < releases.length ? `All (${filteredReleases.length})` : "All"}</button>
         <button className="btn" onClick={clearAll}>None</button>
-        <span style={{ fontSize: 12, color: "royalblue", fontWeight: 700, fontFamily: "monospace", padding: "6px 10px", background: "#f9f9f9", border: "1px solid #aaa" }}>{selected.size} selected</span>
+        <span style={{ fontSize: 13, lineHeight: 1, color: "royalblue", fontWeight: 700, fontFamily: "monospace", padding: "0 10px", height: 27, display: "inline-flex", alignItems: "center", background: "#f9f9f9", border: "1px solid #aaa" }}>{selected.size} selected</span>
         {sortKey && (
           <span className="box" style={{ fontSize: 12, color: "#555", padding: "6px 10px", display: "flex", alignItems: "center", gap: 5 }}>
             Sorted by <strong style={{ color: "#000" }}>{COLUMNS.find((c) => c.key === sortKey)?.label}</strong> {sortDir === "asc" ? "↑" : "↓"}
