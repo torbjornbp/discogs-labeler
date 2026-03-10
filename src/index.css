@@ -14,13 +14,6 @@
   font-display: fallback;
 }
 
-@font-face {
-  font-family: 'Iosevka Term Web';
-  src: url('https://torbjorn.no/fonts/IosevkaCustomTerm-Regular-reducedmore.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
 
 :root {
   --text-color: #000;
@@ -47,7 +40,7 @@ input, button { font-family: inherit; }
   box-shadow: 2px 2px #ddd;
   background: #f9f9f9;
   padding: 0 10px;
-  height: 27px;
+  min-height: 27px;
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
@@ -63,7 +56,7 @@ input, button { font-family: inherit; }
   background: royalblue;
   color: white;
   padding: 0 10px;
-  height: 27px;
+  min-height: 27px;
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
