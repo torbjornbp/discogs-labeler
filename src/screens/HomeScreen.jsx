@@ -30,9 +30,10 @@ export default function HomeScreen({ inputMode, setInputMode, username, setUsern
 
           {inputMode === "username" && (
             <div>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#777", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Discogs Username</label>
+              <label htmlFor="discogs-username" style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#777", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Discogs Username</label>
               <p style={{ fontSize: 12, color: "#999", marginBottom: 10, lineHeight: 1.5 }}>For large collections, CSV Upload is faster and more reliable.</p>
               <input
+                id="discogs-username"
                 ref={inputRef}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -48,10 +49,13 @@ export default function HomeScreen({ inputMode, setInputMode, username, setUsern
 
           {inputMode === "csv" && (
             <div>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#777", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Discogs Collection Export (.csv)</label>
-              <input ref={fileInputRef} type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => handleCSV(e.target.files[0])} />
+              <label htmlFor="csv-upload" style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#777", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>Discogs Collection Export (.csv)</label>
+              <input id="csv-upload" ref={fileInputRef} type="file" accept=".csv" style={{ display: "none" }} onChange={(e) => handleCSV(e.target.files[0])} />
               <div
+                role="button"
+                tabIndex={0}
                 onClick={() => fileInputRef.current?.click()}
+                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && fileInputRef.current?.click()}
                 onDragOver={(e) => { e.preventDefault(); setCsvDrag(true); }}
                 onDragLeave={() => setCsvDrag(false)}
                 onDrop={(e) => { e.preventDefault(); setCsvDrag(false); handleCSV(e.dataTransfer.files[0]); }}
