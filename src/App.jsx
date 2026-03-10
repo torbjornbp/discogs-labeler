@@ -90,7 +90,11 @@ export default function App() {
     setLoadingMsg("Connecting to Discogs…");
     try {
       setLoadingMsg("Fetching your collection…");
-      const raw = await fetchAllReleases(username.trim());
+      const raw = await fetchAllReleases(username.trim(), 0, ({ page, total, count, status }) => {
+        setLoadingMsg(status
+          ? `Page ${page}/${total ?? "?"} — ${status}`
+          : `Fetching your collection… (page ${page}/${total ?? "?"}, ${count} releases)`);
+      });
       if (raw.length === 0) throw new Error("Collection is empty or private.");
       const formatted = raw.map(formatRelease);
       setReleases(formatted);
@@ -169,7 +173,7 @@ export default function App() {
         }
       }
       onProgress(i + 1, toFetch.length, null);
-      if (i < toFetch.length - 1) await sleep(2500);
+      if (i < toFetch.length - 1) await sleep(3000);
     }
   }
 

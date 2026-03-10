@@ -2,25 +2,71 @@ import { DISCOGS_API } from "./templates.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-export async function fetchAllReleases(username, folder = 0) {
-  let page = 1;
-  let allReleases = [];
-  while (true) {
+// Discogs allows 25 req/min unauthenticated (moving average over 60s window).
+// Rate limit headers are not accessible from the browser due to CORS, so we
+// throttle with a fixed delay that keeps us safely under the limit.
+const DELAY_MS = 3000;
+
+async function fetchPage(username, folder, page) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  try {
     const res = await fetch(
       `${DISCOGS_API}/users/${username}/collection/folders/${folder}/releases?per_page=100&page=${page}`,
-      { headers: { "User-Agent": "DiscogsLabelPrinter/1.0" } }
+      { headers: { "User-Agent": "DiscogsLabelPrinter/1.0" }, signal: controller.signal }
     );
     if (res.status === 429) {
-      const retryAfter = parseInt(res.headers.get("Retry-After") || "1", 10);
-      await sleep(Math.max(retryAfter, 1) * 1000);
-      continue;
+      const retryAfter = parseInt(res.headers.get("Retry-After") ?? "60", 10);
+      return { rateLimited: true, retryAfter };
     }
-    if (!res.ok) throw new Error(`Discogs error: ${res.status}`);
+    if (res.status === 404) return { notFound: true };
+    if (!res.ok) throw new Error(`Discogs API error: ${res.status}`);
     const data = await res.json();
+    return { data };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+export async function fetchAllReleases(username, folder = 0, onProgress) {
+  let page = 1;
+  let totalPages = null;
+  let allReleases = [];
+  const startTime = Date.now();
+
+  while (true) {
+    let attempt = 0;
+    let result;
+    while (true) {
+      try {
+        result = await fetchPage(username, folder, page);
+      } catch (err) {
+        attempt++;
+        console.warn(`Page ${page} attempt ${attempt} failed:`, err.message);
+        if (attempt >= 3) throw new Error(`Failed to load page ${page} — Discogs appears to be unavailable. Try again later.`);
+        const isTimeout = err.name === "AbortError";
+        if (onProgress) onProgress({ page, total: totalPages, count: allReleases.length, status: `Retrying…` });
+        await sleep(isTimeout ? 5000 : 60000);
+        continue;
+      }
+      if (result.notFound) throw new Error(`User "${username}" not found on Discogs.`);
+      if (result.rateLimited) {
+        const wait = Math.max(result.retryAfter, 60) * 1000;
+        if (onProgress) onProgress({ page, total: totalPages, count: allReleases.length, status: `Rate limited — waiting ${Math.round(wait / 1000)}s…` });
+        await sleep(wait);
+        continue;
+      }
+      break;
+    }
+
+    const { data } = result;
     allReleases = allReleases.concat(data.releases || []);
-    if (page >= (data.pagination?.pages || 1)) break;
+    totalPages = data.pagination?.pages ?? 1;
+
+    if (onProgress) onProgress({ page, total: totalPages, count: allReleases.length });
+    if (page >= totalPages) break;
     page++;
-    await sleep(300);
+    await sleep(DELAY_MS);
   }
   return allReleases;
 }
