@@ -85,8 +85,20 @@ export function openPrintWindow({ selectedReleases, template, fields, fieldOrder
 <head>
   <meta charset="utf-8"/>
   <style>
+    @font-face {
+      font-family: 'Iosevka Aile';
+      src: url('https://torbjorn.no/fonts/IosevkaCustomAile-Regular-reducedmore.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Iosevka Aile';
+      src: url('https://torbjorn.no/fonts/IosevkaCustomAile-Bold-reducedmore.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
     * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:210mm; background:#fff; }
+    html, body { width:210mm; background:#fff; font-family: ${FONT_FAMILY}; }
     @page { size: A4 portrait; margin: 0mm; }
     @media print { html, body { margin: 0; } }
   </style>
@@ -103,16 +115,19 @@ export function openPrintWindow({ selectedReleases, template, fields, fieldOrder
   const cleanup = () => { if (!revoked) { revoked = true; URL.revokeObjectURL(url); } };
 
   const afterLoad = () => {
-    const imgs = win.document.images;
-    let loaded = 0;
-    const total = imgs.length;
-    const done = () => { win.print(); cleanup(); };
-    if (total === 0) { done(); return; }
-    const tryPrint = () => { if (++loaded >= total) done(); };
-    Array.from(imgs).forEach((img) => {
-      if (img.complete) tryPrint();
-      else { img.onload = tryPrint; img.onerror = tryPrint; }
+    const waitForImages = () => new Promise((resolve) => {
+      const imgs = win.document.images;
+      let loaded = 0;
+      const total = imgs.length;
+      if (total === 0) { resolve(); return; }
+      const check = () => { if (++loaded >= total) resolve(); };
+      Array.from(imgs).forEach((img) => {
+        if (img.complete) check();
+        else { img.onload = check; img.onerror = check; }
+      });
     });
+    const waitForFonts = () => win.document.fonts.ready;
+    Promise.all([waitForImages(), waitForFonts()]).then(() => { win.print(); cleanup(); });
   };
 
   win.addEventListener("beforeunload", cleanup);
