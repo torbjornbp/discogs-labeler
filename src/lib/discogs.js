@@ -171,8 +171,8 @@ export function parseDiscogsCSV(text) {
 export function sortReleases(list, sortKey, sortDir) {
   if (!sortKey) return list;
   return [...list].sort((a, b) => {
-    let av = (a[sortKey] ?? "").toString().toLowerCase();
-    let bv = (b[sortKey] ?? "").toString().toLowerCase();
+    let av = (a[sortKey] ?? "").toString();
+    let bv = (b[sortKey] ?? "").toString();
     if (sortKey === "year" || sortKey === "rating") {
       av = parseInt(av) || 0;
       bv = parseInt(bv) || 0;
@@ -183,6 +183,8 @@ export function sortReleases(list, sortKey, sortDir) {
       bv = bv ? new Date(bv).getTime() : 0;
       return sortDir === "asc" ? av - bv : bv - av;
     }
+    av = av.toLowerCase();
+    bv = bv.toLowerCase();
     if (av < bv) return sortDir === "asc" ? -1 : 1;
     if (av > bv) return sortDir === "asc" ? 1 : -1;
     return 0;
