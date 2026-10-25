@@ -2,24 +2,21 @@ export const DISCOGS_API = "https://api.discogs.com";
 
 export const FONT_FAMILY = "'Iosevka Aile', Arial, sans-serif";
 
-export const QR_BASE_PX = 76;   // preview size at 96dpi
-export const QR_BASE_MM = 20;   // print size in mm
+export const MM = 3.7795; // CSS px per mm at 96dpi
 
-export const QR_API = (data) =>
-  `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(data)}&bgcolor=ffffff&color=111111&margin=2`;
+export const QR_BASE_MM = 20; // printed QR size in mm
+export const QR_BASE_PX = QR_BASE_MM * MM;
 
-export const QR_API_PRINT = (data) =>
-  `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(data)}&bgcolor=ffffff&color=111111&margin=2`;
+export const mmToPx = (mm) => mm * MM;
 
-export const MM = 3.7795;
-
-function makeTemplate(t) {
+export function makeTemplate(t) {
   return {
+    maxQrScale: 1.5,
     ...t,
-    labelW:    t.labelWmm    * MM,
-    labelH:    t.labelHmm    * MM,
-    pageW:     t.pageWmm     * MM,
-    pageH:     t.pageHmm     * MM,
+    labelW: t.labelWmm * MM,
+    labelH: t.labelHmm * MM,
+    pageW: t.pageWmm * MM,
+    pageH: t.pageHmm * MM,
     marginTop: t.marginTopMm * MM,
     marginLeft: t.marginLeftMm * MM,
   };
@@ -38,5 +35,19 @@ export const TEMPLATES = [
     pageHmm: 297,
     marginTopMm: 0.5,
     marginLeftMm: 0,
+  }),
+  makeTemplate({
+    id: "brother-dk1201",
+    name: "Brother DK-1201 (experimental)",
+    description: "90.3 × 29 mm · 1 per page",
+    cols: 1,
+    rows: 1,
+    labelWmm: 90.3,
+    labelHmm: 29,
+    pageWmm: 90.3,
+    pageHmm: 29,
+    marginTopMm: 0,
+    marginLeftMm: 0,
+    maxQrScale: 1.0,
   }),
 ];

@@ -1,13 +1,13 @@
+import { memo } from "react";
 import LabelCell from "./LabelCell.jsx";
 
-export default function PrintSheet({ releases, template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields }) {
+function PrintSheet({ releases = [], template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields, pricePrefix = "" }) {
   const total = template.cols * template.rows;
-  const cells = releases.slice(0, total);
+  const cells = [...(releases || [])].slice(0, total);
   while (cells.length < total) cells.push(null);
 
   return (
     <div
-      id="print-sheet"
       style={{
         width: template.pageW,
         height: template.pageH,
@@ -38,6 +38,7 @@ export default function PrintSheet({ releases, template, fields, fontScale, qrSc
               layoutMode={layoutMode}
               tracklistMap={tracklistMap}
               col2Fields={col2Fields}
+              pricePrefix={pricePrefix}
             />
           ) : (
             <div
@@ -55,3 +56,5 @@ export default function PrintSheet({ releases, template, fields, fontScale, qrSc
     </div>
   );
 }
+
+export default memo(PrintSheet);
