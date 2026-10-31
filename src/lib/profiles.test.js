@@ -15,6 +15,7 @@ describe("createDefaultProfile", () => {
     const profile = createDefaultProfile(template);
 
     expect(profile.fontScale).toBe(1);
+    expect(profile.priceScale).toBe(1);
     expect(profile.qrScale).toBe(0.65);
     expect(profile.pad).toEqual(DEFAULT_PAD);
     expect(profile.layoutMode).toBe("single");
@@ -50,6 +51,7 @@ describe("normalizeProfile", () => {
         fields: { artist: { on: false } },
         fieldOrder: ["title", "artist", "oldField"],
         fontScale: 1.25,
+        priceScale: 1.5,
         qrScale: 0.8,
         pad: { t: 1, r: 2 },
         layoutMode: "twoColumn",
@@ -62,6 +64,7 @@ describe("normalizeProfile", () => {
     expect(profile.fieldOrder.slice(0, 2)).toEqual(["title", "artist"]);
     expect(profile.fieldOrder).not.toContain("oldField");
     expect(profile.fontScale).toBe(1.25);
+    expect(profile.priceScale).toBe(1.5);
     expect(profile.qrScale).toBe(0.8);
     expect(profile.pad).toEqual({ t: 1, r: 2, b: 1.2, l: 4.5 });
     expect(profile.layoutMode).toBe("twoColumn");
@@ -75,6 +78,7 @@ describe("normalizeProfile", () => {
         fields: "nope",
         fieldOrder: { nope: true },
         fontScale: "junk",
+        priceScale: 99,
         qrScale: null,
         pad: "nope",
         layoutMode: "weird",
@@ -86,6 +90,7 @@ describe("normalizeProfile", () => {
     expect(profile.fields.artist.on).toBe(true);
     expect(profile.fieldOrder[0]).toBe("qr");
     expect(profile.fontScale).toBe(1);
+    expect(profile.priceScale).toBe(2.5);
     expect(profile.qrScale).toBe(0.65);
     expect(profile.pad).toEqual(DEFAULT_PAD);
     expect(profile.layoutMode).toBe("single");

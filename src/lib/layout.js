@@ -6,5 +6,6 @@ export const LABEL_LAYOUT = {
   twoColBorderMm: 0.3,
   twoColPaddingMm: 1.5,
   writeInLineMm: 20,
+  writeInMinLineMm: 6,
   writeInBorderMm: 0.3,
 };

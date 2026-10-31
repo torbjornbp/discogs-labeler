@@ -121,6 +121,7 @@ export default function App() {
   const setFields = (value) => updateCurrentProfile("fields", value);
   const setFieldOrder = (value) => updateCurrentProfile("fieldOrder", value);
   const setFontScale = (value) => updateCurrentProfile("fontScale", value);
+  const setPriceScale = (value) => updateCurrentProfile("priceScale", value);
   const setQrScale = (value) => updateCurrentProfile("qrScale", value);
   const setPad = (value) => updateCurrentProfile("pad", value);
   const setLayoutMode = (value) => updateCurrentProfile("layoutMode", value);
@@ -409,6 +410,8 @@ export default function App() {
     setFieldOrder,
     fontScale: currentProfile.fontScale,
     setFontScale,
+    priceScale: currentProfile.priceScale,
+    setPriceScale,
     qrScale: currentProfile.qrScale,
     setQrScale,
     pad: currentProfile.pad,

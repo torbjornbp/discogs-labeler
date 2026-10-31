@@ -8,6 +8,10 @@ export const MIN_FONT_SCALE = 0.6;
 export const MAX_FONT_SCALE = 2;
 export const DEFAULT_FONT_SCALE = 1;
 
+export const MIN_PRICE_SCALE = 0.8;
+export const MAX_PRICE_SCALE = 2.5;
+export const DEFAULT_PRICE_SCALE = 1;
+
 export const MIN_QR_SCALE = 0.5;
 export const MAX_QR_SCALE = 1.5;
 export const DEFAULT_QR_SCALE = 0.65;
@@ -51,6 +55,7 @@ export function createDefaultProfile(template) {
     fields: normalizeFields(null),
     fieldOrder: normalizeFieldOrder(null),
     fontScale: DEFAULT_FONT_SCALE,
+    priceScale: DEFAULT_PRICE_SCALE,
     qrScale: clamp(
       DEFAULT_QR_SCALE,
       MIN_QR_SCALE,
@@ -81,6 +86,12 @@ export function normalizeProfile(saved, template) {
       MIN_FONT_SCALE,
       MAX_FONT_SCALE,
       defaults.fontScale
+    ),
+    priceScale: clamp(
+      saved.priceScale,
+      MIN_PRICE_SCALE,
+      MAX_PRICE_SCALE,
+      defaults.priceScale
     ),
     qrScale: clamp(
       saved.qrScale,

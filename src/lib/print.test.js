@@ -114,6 +114,7 @@ describe("buildDocument", () => {
 
   it("renders a fixed write-in line without leaking an imported price", () => {
     const fields = normalizeFields(null);
+    fields.price.on = false;
     fields.priceWriteIn.on = true;
 
     const html = buildDocument(
@@ -123,6 +124,24 @@ describe("buildDocument", () => {
     expect(html).toContain("Price:");
     expect(html).toContain("width:20mm;height:1em;border-bottom:0.3mm");
     expect(html).not.toContain("Price: 24.99");
+  });
+
+  it("scales both price and write-in price fields with priceScale in bold", () => {
+    const fields = normalizeFields(null);
+    fields.price.on = true;
+    fields.priceWriteIn.on = true;
+
+    const html = buildDocument(
+      makeOptions([release(1, { price: "24.99" })], {
+        fields,
+        fontScale: 1,
+        priceScale: 1.5,
+      })
+    );
+
+    // 2.3mm * 1.5 = 3.45mm, weight 700, and write-in line 20mm * 1.5 = 30mm
+    expect(html).toContain("font-size:3.45mm;font-weight:700");
+    expect(html).toContain("width:30mm;height:1em;border-bottom:0.3mm");
   });
 
   it("renders the write-in line for releases with no price", () => {

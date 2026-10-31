@@ -1,7 +1,7 @@
 import { memo } from "react";
 import LabelCell from "./LabelCell.jsx";
 
-function PrintSheet({ releases = [], template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields, pricePrefix = "" }) {
+function PrintSheet({ releases = [], template, fields, fontScale, priceScale = 1, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields, pricePrefix = "" }) {
   const total = template.cols * template.rows;
   const cells = [...(releases || [])].slice(0, total);
   while (cells.length < total) cells.push(null);
@@ -32,6 +32,7 @@ function PrintSheet({ releases = [], template, fields, fontScale, qrScale, field
               template={template}
               fields={fields}
               fontScale={fontScale}
+              priceScale={priceScale}
               qrScale={qrScale}
               fieldOrder={fieldOrder}
               pad={pad}

@@ -4,8 +4,10 @@ import { LABEL_LAYOUT } from "../lib/layout.js";
 import { FIELD_STYLES, FIELD_VALUE } from "../lib/fields.js";
 import { qrDataUrl } from "../lib/qr.js";
 
-function LabelCell({ release, template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields, pricePrefix = "" }) {
-  const fs = (n) => n * (fontScale || 1);
+const isPriceField = (key) => key === "price" || key === "priceWriteIn";
+
+function LabelCell({ release, template, fields, fontScale, priceScale = 1, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields, pricePrefix = "" }) {
+  const fs = (n, key) => n * (fontScale || 1) * (isPriceField(key) ? (priceScale || 1) : 1);
   const showQR = fieldOrder.includes("qr") && fields.qr?.on;
   const qrUrl = showQR ? qrDataUrl(release.url) : "";
   const tracklist = tracklistMap?.[release.releaseId] || [];
@@ -30,10 +32,12 @@ function LabelCell({ release, template, fields, fontScale, qrScale, fieldOrder, 
     const s = FIELD_STYLES[key] || {};
 
     if (key === "priceWriteIn") {
+      const writeInWidthPx = mmToPx(LABEL_LAYOUT.writeInLineMm) * (priceScale || 1);
       const lineStyle = {
         display: "inline-block",
-        flexShrink: 0,
-        width: mmToPx(LABEL_LAYOUT.writeInLineMm),
+        flex: `0 1 ${writeInWidthPx}px`,
+        minWidth: mmToPx(LABEL_LAYOUT.writeInMinLineMm),
+        width: writeInWidthPx,
         height: "1em",
         borderBottom: `${mmToPx(LABEL_LAYOUT.writeInBorderMm)}px solid ${s.color || "#111"}`,
       };
@@ -42,7 +46,7 @@ function LabelCell({ release, template, fields, fontScale, qrScale, fieldOrder, 
           display: "flex",
           alignItems: "center",
           gap: mmToPx(LABEL_LAYOUT.fieldGapMm),
-          fontSize: fs(s.size || 7),
+          fontSize: fs(s.size || 7, key),
           fontWeight: s.weight || 400,
           fontFamily: s.mono ? "monospace" : FONT_FAMILY,
           color: s.color || "#888",
@@ -82,7 +86,7 @@ function LabelCell({ release, template, fields, fontScale, qrScale, fieldOrder, 
     }
     return (
       <div key={key} style={{
-        fontSize: fs(s.size || 7),
+        fontSize: fs(s.size || 7, key),
         fontWeight: s.weight || 400,
         fontFamily: s.mono ? "monospace" : FONT_FAMILY,
         color: s.color || "#888",

@@ -166,18 +166,20 @@ function PreviewHarness({
   fetchTracklists = noop,
   template = TEMPLATES[0],
   controlTab = "fields",
-  priceOn = false,
+  priceOn,
   initialPricePrefix = "",
+  initialPriceScale = 1,
 }) {
   const [fieldOrder, setFieldOrder] = useState(() => normalizeFieldOrder(null));
   const [fields, setFields] = useState(() => {
     const next = normalizeFields(null);
     next.tracklist.on = tracklistOn;
-    next.price.on = priceOn;
+    if (typeof priceOn === "boolean") next.price.on = priceOn;
     return next;
   });
   const [col2Fields, setCol2Fields] = useState(() => new Set(initialCol2Fields));
   const [pricePrefix, setPricePrefix] = useState(initialPricePrefix);
+  const [priceScale, setPriceScale] = useState(initialPriceScale);
 
   return (
     <PreviewScreen
@@ -191,6 +193,8 @@ function PreviewHarness({
         setFieldOrder,
         fontScale: 1,
         setFontScale: noop,
+        priceScale,
+        setPriceScale,
         qrScale: 0.65,
         setQrScale: noop,
         pad: { t: 3.2, r: 4.5, b: 1.2, l: 4.5 },
@@ -216,16 +220,16 @@ function PreviewHarness({
 }
 
 describe("Inventory CSV behavior", () => {
-  it("shows the price toggle only when selected CSV records contain prices", async () => {
+  it("shows the price toggle selected by default only when selected CSV records contain prices", async () => {
     await mount(
       <PreviewHarness inputMode="csv" releases={[{ ...makeRelease(1), price: "49" }]} />
     );
     const priceButton = container.querySelector('[data-field-key="price"]');
     expect(priceButton).not.toBeNull();
-    expect(priceButton.getAttribute("aria-pressed")).toBe("false");
+    expect(priceButton.getAttribute("aria-pressed")).toBe("true");
 
     await click(priceButton);
-    expect(priceButton.getAttribute("aria-pressed")).toBe("true");
+    expect(priceButton.getAttribute("aria-pressed")).toBe("false");
 
     await mount(<PreviewHarness inputMode="csv" releases={[makeRelease(2)]} />);
     expect(container.querySelector('[data-field-key="price"]')).toBeNull();
@@ -313,17 +317,23 @@ describe("Preview copies and pagination", () => {
 });
 
 describe("Preview currency prefix", () => {
-  it("shows the prefix input when the price field is on and passes it to print", async () => {
+  it("shows price size and prefix controls when price is on, hides them when untoggled, and passes both to print", async () => {
     const releases = [{ ...makeRelease(1), price: "49" }];
-    await mount(<PreviewHarness inputMode="csv" releases={releases} />);
+    await mount(<PreviewHarness inputMode="csv" releases={releases} priceOn={false} />);
 
+    expect(container.querySelector('input[aria-label="Price size"]')).toBeNull();
     expect(container.querySelector('input[aria-label="Currency prefix"]')).toBeNull();
 
     await click(container.querySelector('[data-field-key="price"]'));
 
+    const priceSize = container.querySelector('input[aria-label="Price size"]');
     const prefix = container.querySelector('input[aria-label="Currency prefix"]');
+    expect(priceSize).not.toBeNull();
     expect(prefix).not.toBeNull();
     expect(prefix.maxLength).toBe(8);
+
+    await setFormValue(priceSize, "150");
+    expect(priceSize.value).toBe("150");
 
     await setFormValue(prefix, "$");
     expect(prefix.value).toBe("$");
@@ -333,9 +343,25 @@ describe("Preview currency prefix", () => {
     expect(openPrintWindow).toHaveBeenCalledTimes(1);
     expect(openPrintWindow.mock.calls[0][0]).toMatchObject({
       pricePrefix: "$",
+      priceScale: 1.5,
       startCell: 0,
     });
     expect(openPrintWindow.mock.calls[0][0].selectedReleases).toHaveLength(1);
+
+    await click(container.querySelector('[data-field-key="price"]'));
+    expect(container.querySelector('input[aria-label="Price size"]')).toBeNull();
+    expect(container.querySelector('input[aria-label="Currency prefix"]')).toBeNull();
+  });
+
+  it("shows price size (without currency prefix) when only write-in price is enabled", async () => {
+    await mount(<PreviewHarness />);
+    const writeIn = container.querySelector('[data-field-key="priceWriteIn"]');
+    expect(writeIn.getAttribute("aria-pressed")).toBe("false");
+    expect(container.querySelector('input[aria-label="Price size"]')).toBeNull();
+
+    await click(writeIn);
+    expect(container.querySelector('input[aria-label="Price size"]')).not.toBeNull();
+    expect(container.querySelector('input[aria-label="Currency prefix"]')).toBeNull();
   });
 
   it("keeps the write-in price field visible in API mode and CSV without prices", async () => {

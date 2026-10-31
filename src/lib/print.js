@@ -12,15 +12,18 @@ const esc = (value) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
-function buildTextField(key, release, tracklist, fields, fmm, pricePrefix = "") {
+function buildTextField(key, release, tracklist, fields, fmm, pricePrefix = "", priceScale = 1) {
   if (!fields[key]?.on) return "";
 
   const style = FIELD_STYLES[key] || {};
+  const isPriceField = key === "price" || key === "priceWriteIn";
+  const fieldFmm = (n) => fmm(n * (isPriceField ? (priceScale || 1) : 1));
 
   if (key === "priceWriteIn") {
     const color = style.color || "#111";
     const fontFamily = style.mono ? "monospace" : FONT_FAMILY;
-    return `<div style="display:flex;align-items:center;gap:${LABEL_LAYOUT.fieldGapMm}mm;font-size:${fmm(style.mmSize || 2)}mm;font-weight:${style.weight || 400};font-family:${fontFamily};color:${color};line-height:1.25;white-space:nowrap;overflow:hidden;flex-shrink:0;${style.italic ? "font-style:italic;" : ""}${style.mono ? "letter-spacing:0.02em;" : ""}"><span>Price:</span><span aria-hidden="true" style="display:inline-block;flex-shrink:0;width:${LABEL_LAYOUT.writeInLineMm}mm;height:1em;border-bottom:${LABEL_LAYOUT.writeInBorderMm}mm solid ${color};"></span></div>`;
+    const writeInWidthMm = Number((LABEL_LAYOUT.writeInLineMm * (priceScale || 1)).toFixed(2));
+    return `<div style="display:flex;align-items:center;gap:${LABEL_LAYOUT.fieldGapMm}mm;font-size:${fieldFmm(style.mmSize || 2)}mm;font-weight:${style.weight || 400};font-family:${fontFamily};color:${color};line-height:1.25;white-space:nowrap;overflow:hidden;flex-shrink:0;${style.italic ? "font-style:italic;" : ""}${style.mono ? "letter-spacing:0.02em;" : ""}"><span>Price:</span><span aria-hidden="true" style="display:inline-block;flex:0 1 ${writeInWidthMm}mm;min-width:${LABEL_LAYOUT.writeInMinLineMm}mm;width:${writeInWidthMm}mm;height:1em;border-bottom:${LABEL_LAYOUT.writeInBorderMm}mm solid ${color};"></span></div>`;
   }
 
   const value = key === "tracklist" ? tracklist : FIELD_VALUE(release, key, pricePrefix);
@@ -44,13 +47,13 @@ function buildTextField(key, release, tracklist, fields, fmm, pricePrefix = "") 
   const notesPrefix = key === "notes"
     ? '<span style="font-weight:700;font-style:normal;">Notes: </span>'
     : "";
-  return `<div style="font-size:${fmm(style.mmSize || 2)}mm;font-weight:${style.weight || 400};font-family:${fontFamily};color:${style.color || "#888"};line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:${style.clamp || 1};-webkit-box-orient:vertical;${style.italic ? "font-style:italic;" : ""}${style.mono ? "letter-spacing:0.02em;" : ""}flex-shrink:0;">${notesPrefix}${esc(value)}</div>`;
+  return `<div style="font-size:${fieldFmm(style.mmSize || 2)}mm;font-weight:${style.weight || 400};font-family:${fontFamily};color:${style.color || "#888"};line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:${style.clamp || 1};-webkit-box-orient:vertical;${style.italic ? "font-style:italic;" : ""}${style.mono ? "letter-spacing:0.02em;" : ""}flex-shrink:0;">${notesPrefix}${esc(value)}</div>`;
 }
 
 // Generates the HTML string for a single label.
 function buildLabel(release, opts) {
   const {
-    template, fields, fieldOrder, pad, fontScale, qrScale,
+    template, fields, fieldOrder, pad, fontScale, priceScale = 1, qrScale,
     layoutMode, tracklistMap, col2Fields, preparedQrCodes, pricePrefix = "",
   } = opts;
 
@@ -82,8 +85,8 @@ function buildLabel(release, opts) {
     const col2 = col2Fields ? [...col2Fields] : ["tracklist"];
     const col1Keys = fieldOrder.filter((key) => key !== "qr" && !col2.includes(key));
     const col2Keys = fieldOrder.filter((key) => col2.includes(key));
-    const col1Html = col1Keys.map((key) => buildTextField(key, release, tracklist, fields, fmm, pricePrefix)).join("");
-    const col2Html = col2Keys.map((key) => buildTextField(key, release, tracklist, fields, fmm, pricePrefix)).join("");
+    const col1Html = col1Keys.map((key) => buildTextField(key, release, tracklist, fields, fmm, pricePrefix, priceScale)).join("");
+    const col2Html = col2Keys.map((key) => buildTextField(key, release, tracklist, fields, fmm, pricePrefix, priceScale)).join("");
     const hasCol2 = col2Keys.some((key) => fields[key]?.on);
     const col2HtmlBlock = hasCol2
       ? `<div style="flex:1;min-width:0;border-left:${LABEL_LAYOUT.twoColBorderMm}mm solid #e0e0e0;padding-left:${LABEL_LAYOUT.twoColPaddingMm}mm;overflow:hidden;display:flex;flex-direction:column;gap:${LABEL_LAYOUT.fieldGapMm}mm;max-height:${contentH};">${col2Html}</div>`
@@ -93,7 +96,7 @@ function buildLabel(release, opts) {
 
   const textFields = fieldOrder
     .filter((key) => key !== "qr")
-    .map((key) => buildTextField(key, release, tracklist, fields, fmm, pricePrefix))
+    .map((key) => buildTextField(key, release, tracklist, fields, fmm, pricePrefix, priceScale))
     .join("");
 
   return `<div style="${outerStyle}">${qrHtml}<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:${LABEL_LAYOUT.fieldGapMm}mm;max-height:${contentH};overflow:hidden;">${textFields}</div></div>`;
@@ -106,6 +109,7 @@ export function buildDocument({
   fieldOrder,
   pad,
   fontScale,
+  priceScale = 1,
   qrScale,
   layoutMode,
   tracklistMap,
@@ -117,7 +121,7 @@ export function buildDocument({
   const perSheet = template.cols * template.rows;
   const pages = paginateReleases(selectedReleases, perSheet, startCell);
   const opts = {
-    template, fields, fieldOrder, pad, fontScale, qrScale,
+    template, fields, fieldOrder, pad, fontScale, priceScale, qrScale,
     layoutMode, tracklistMap, col2Fields, preparedQrCodes, pricePrefix,
   };
 

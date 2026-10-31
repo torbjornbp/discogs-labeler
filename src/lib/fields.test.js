@@ -69,8 +69,14 @@ describe("formatPrice", () => {
 });
 
 describe("price write-in schema", () => {
-  it("matches the price style and turns the field off by default", () => {
+  it("matches the bold price style and turns write-in off by default while CSV price defaults on", () => {
+    expect(FIELD_STYLES.price.mmSize).toBe(2.3);
+    expect(FIELD_STYLES.price.weight).toBe(700);
     expect(FIELD_STYLES.priceWriteIn).toEqual(FIELD_STYLES.price);
+    expect(DEFAULT_FIELDS.price).toEqual({
+      label: "Price",
+      on: true,
+    });
     expect(DEFAULT_FIELDS.priceWriteIn).toEqual({
       label: "Price (write-in)",
       on: false,

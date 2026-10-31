@@ -27,6 +27,7 @@ export default function PreviewScreen({
 }) {
   const {
     fields, setFields, fieldOrder, setFieldOrder, fontScale, setFontScale,
+    priceScale = 1, setPriceScale,
     qrScale, setQrScale, pad, setPad, layoutMode, setLayoutMode,
     col2Fields, setCol2Fields, tracklistMap, cancelTracklists,
     pricePrefix = "", setPricePrefix,
@@ -98,6 +99,7 @@ export default function PreviewScreen({
     fieldOrder,
     pad,
     fontScale,
+    priceScale,
     qrScale,
     layoutMode,
     tracklistMap,
@@ -106,7 +108,7 @@ export default function PreviewScreen({
     startCell,
   });
 
-  const sheetProps = { template, fields, fontScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields, pricePrefix };
+  const sheetProps = { template, fields, fontScale, priceScale, qrScale, fieldOrder, pad, layoutMode, tracklistMap, col2Fields, pricePrefix };
   const hasPrice = inputMode === "csv" && selectedReleases.some((release) => release.price);
   const hasReleaseIds = selectedReleases.some((release) => release.releaseId);
 
@@ -455,24 +457,42 @@ const TABS = [["layout", "Layout"], ["fields", "Fields"], ["padding", "Padding"]
                 Drag to reorder · with a field focused, Alt+↑/↓ moves it
               </p>
 
-              {hasPrice && fields.price?.on && (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
-                  <label htmlFor="currency-prefix" style={{ fontSize: 11, color: "#777", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                    Currency prefix
-                  </label>
-                  <input
-                    id="currency-prefix"
-                    aria-label="Currency prefix"
-                    type="text"
-                    maxLength={8}
-                    value={pricePrefix}
-                    onChange={(e) => setPricePrefix?.(e.target.value)}
-                    placeholder="$"
-                    style={{ width: 72, padding: "2px 6px", border: "1px solid #aaa", background: "#fff", color: "#000", fontSize: 12, fontFamily: "monospace" }}
-                  />
-                  <span style={{ fontSize: 11, color: "#777", lineHeight: 1.4 }}>
-                    Printed exactly as entered, e.g. <code style={{ fontFamily: "monospace" }}>kr </code> with a trailing space.
-                  </span>
+              {((hasPrice && fields.price?.on) || fields.priceWriteIn?.on) && (
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8, flexWrap: "wrap" }}>
+                  <div className="box" style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px" }}>
+                    <span style={{ fontSize: 11, color: "#777", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", whiteSpace: "nowrap" }}>Price size</span>
+                    <input
+                      type="range"
+                      aria-label="Price size"
+                      min="80"
+                      max="250"
+                      step="5"
+                      value={Math.round(priceScale * 100)}
+                      onChange={(e) => setPriceScale?.(Number.parseInt(e.target.value, 10) / 100)}
+                      style={{ width: 80, accentColor: "royalblue", cursor: "pointer" }}
+                    />
+                    <span style={{ fontSize: 11, fontFamily: "monospace", color: "#555", minWidth: 28, textAlign: "right" }}>{Math.round(priceScale * 100)}%</span>
+                  </div>
+                  {hasPrice && fields.price?.on && (
+                    <>
+                      <label htmlFor="currency-prefix" style={{ fontSize: 11, color: "#777", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                        Currency prefix
+                      </label>
+                      <input
+                        id="currency-prefix"
+                        aria-label="Currency prefix"
+                        type="text"
+                        maxLength={8}
+                        value={pricePrefix}
+                        onChange={(e) => setPricePrefix?.(e.target.value)}
+                        placeholder="$"
+                        style={{ width: 72, padding: "2px 6px", border: "1px solid #aaa", background: "#fff", color: "#000", fontSize: 12, fontFamily: "monospace" }}
+                      />
+                      <span style={{ fontSize: 11, color: "#777", lineHeight: 1.4 }}>
+                        Printed exactly as entered, e.g. <code style={{ fontFamily: "monospace" }}>kr </code> with a trailing space.
+                      </span>
+                    </>
+                  )}
                 </div>
               )}
 

@@ -191,6 +191,7 @@ describe("screen smoke tests", () => {
 
   it("renders a write-in price line without leaking the imported price", () => {
     const fields = normalizeFields(null);
+    fields.price.on = false;
     fields.priceWriteIn.on = true;
     const html = renderPreview({
       selectedReleases: [{ ...releases[0], price: "49" }],
